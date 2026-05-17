@@ -8,23 +8,23 @@
 
 ## เลือกคู่มือของคุณ
 
-| ระบบ | ไฟล์ |
-|---|---|
+| ระบบ    | ไฟล์                                   |
+| ------- | -------------------------------------- |
 | Windows | [README_Windows.md](README_Windows.md) |
-| Linux | [README_Linux.md](README_Linux.md) |
-| macOS | [README_Mac.md](README_Mac.md) |
+| Linux   | [README_Linux.md](README_Linux.md)     |
+| macOS   | [README_Mac.md](README_Mac.md)         |
 
 ## ไฟล์ template ที่ให้มา
 
-| ไฟล์ | ใช้ทำอะไร |
-|---|---|
-| [Makefile](Makefile) | รวม command สั้น ๆ เช่น `make ssh`, `make upload-code`, `make job-gpu` |
-| [environment.yml](environment.yml) | สร้าง conda/mamba environment |
-| [requirements.txt](requirements.txt) | ติดตั้ง Python libraries ด้วย pip |
-| [slurm/run_cpu.sbatch](slurm/run_cpu.sbatch) | Template สำหรับส่งงาน CPU |
-| [slurm/run_gpu.sbatch](slurm/run_gpu.sbatch) | Template สำหรับส่งงาน GPU |
-| [src/check_env.py](src/check_env.py) | Script ทดสอบ environment |
-| [src/train_yolo_example.py](src/train_yolo_example.py) | ตัวอย่าง script สำหรับงาน Computer Vision / YOLO |
+| ไฟล์                                                   | ใช้ทำอะไร                                                              |
+| ------------------------------------------------------ | ---------------------------------------------------------------------- |
+| [Makefile](Makefile)                                   | รวม command สั้น ๆ เช่น `make ssh`, `make upload-code`, `make job-gpu` |
+| [environment.yml](environment.yml)                     | สร้าง conda/mamba environment                                          |
+| [requirements.txt](requirements.txt)                   | ติดตั้ง Python libraries ด้วย pip                                      |
+| [slurm/run_cpu.sbatch](slurm/run_cpu.sbatch)           | Template สำหรับส่งงาน CPU                                              |
+| [slurm/run_gpu.sbatch](slurm/run_gpu.sbatch)           | Template สำหรับส่งงาน GPU                                              |
+| [src/check_env.py](src/check_env.py)                   | Script ทดสอบ environment                                               |
+| [src/train_yolo_example.py](src/train_yolo_example.py) | ตัวอย่าง script สำหรับงาน Computer Vision / YOLO                       |
 
 ## Flow ที่จะสอนทีม
 
@@ -42,16 +42,16 @@
 
 ## แผนสอนแบบ 90 นาที
 
-| เวลา | หัวข้อ | เป้าหมาย |
-|---:|---|---|
-| 0-10 นาที | Concept: local, LANTA, Slurm | เข้าใจว่าทำไมต้อง submit job |
-| 10-25 นาที | SSH + SSH key | ทุกคนเข้า LANTA ได้ |
-| 25-35 นาที | SSH config + Makefile | ใช้ command สั้นได้ |
-| 35-45 นาที | Project folder + permission | โครงสร้าง project พร้อม |
-| 45-60 นาที | mamba/conda + pip | environment พร้อมสำหรับ CV |
-| 60-70 นาที | scp upload data/code | data/code อยู่บน LANTA |
-| 70-85 นาที | Slurm CPU/GPU | submit job ได้จริง |
-| 85-90 นาที | download output + recap | เห็น workflow ครบหนึ่งรอบ |
+|       เวลา | หัวข้อ                       | เป้าหมาย                     |
+| ---------: | ---------------------------- | ---------------------------- |
+|  0-10 นาที | Concept: local, LANTA, Slurm | เข้าใจว่าทำไมต้อง submit job |
+| 10-25 นาที | SSH + SSH key                | ทุกคนเข้า LANTA ได้          |
+| 25-35 นาที | SSH config + Makefile        | ใช้ command สั้นได้          |
+| 35-45 นาที | Project folder + permission  | โครงสร้าง project พร้อม      |
+| 45-60 นาที | mamba/conda + pip            | environment พร้อมสำหรับ CV   |
+| 60-70 นาที | scp upload data/code         | data/code อยู่บน LANTA       |
+| 70-85 นาที | Slurm CPU/GPU                | submit job ได้จริง           |
+| 85-90 นาที | download output + recap      | เห็น workflow ครบหนึ่งรอบ    |
 
 ## กติกาที่ควรบอกทีมก่อนเริ่ม
 
@@ -122,5 +122,4 @@ tail -f logs/<LOG_FILE>.out
 6. สร้าง environment
 7. submit CPU test job
 8. submit GPU test job
-9. download output กลับมา
-
+9. download output กลับม//า
