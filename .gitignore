@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+outputs_lanta/
+outputs/
+models/
+logs/
+data/
+*.pt
+*.onnx
+*.engine

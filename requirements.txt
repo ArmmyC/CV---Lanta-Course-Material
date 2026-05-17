@@ -1,0 +1,11 @@
+ultralytics
+opencv-python-headless
+pandas
+numpy
+matplotlib
+scikit-learn
+pillow
+tqdm
+pyyaml
+jupyter
+nbconvert
