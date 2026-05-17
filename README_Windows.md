@@ -18,7 +18,6 @@
 
 ```powershell
 ssh -V
-scp -V
 git --version
 ```
 
@@ -26,7 +25,6 @@ git --version
 
 ```bash
 ssh -V
-scp -V
 git --version
 make --version
 ```
@@ -35,7 +33,7 @@ make --version
 
 ---
 
-## 1. SSH เข้า LANTA ครั้งแรก
+## 1. SSH เข้า LANTA
 
 PowerShell:
 
@@ -57,12 +55,6 @@ whoami
 exit
 ```
 
-สิ่งที่ได้จากขั้นนี้:
-
-- รู้ว่า account ใช้งานได้ไหม
-- รู้ว่า network เข้า LANTA ได้ไหม
-- รู้ว่า shell บน LANTA ใช้งานได้ไหม
-
 ---
 
 ## 2. สร้าง SSH key เพื่อไม่ต้องพิมพ์ password ทุกครั้ง
@@ -70,10 +62,10 @@ exit
 สร้าง key ใน PowerShell:
 
 ```powershell
-ssh-keygen -t ed25519 -C "<USERNAME>@lanta" -f $env:USERPROFILE\.ssh\lanta_ed25519
+ssh-keygen -t ed25519 -C "lanta" -f $env:USERPROFILE\.ssh\lanta_ed25519
 ```
 
-กด Enter ตามขั้นตอน ถ้าใช้จริงควรตั้ง passphrase แต่ถ้า workshop ต้องการเร็ว อาจเว้นว่างได้
+กด Enter ตามขั้นตอน ควรตั้ง passphrase
 
 ดู public key:
 
@@ -92,12 +84,6 @@ type $env:USERPROFILE\.ssh\lanta_ed25519.pub | ssh <USERNAME>@transfer.lanta.nst
 ```powershell
 ssh -i $env:USERPROFILE\.ssh\lanta_ed25519 <USERNAME>@transfer.lanta.nstda.or.th
 ```
-
-สิ่งที่ได้จากขั้นนี้:
-
-- เข้า LANTA ได้เร็วขึ้น
-- ลดปัญหา password ตอน scp/upload หลายรอบ
-- พร้อมใช้ SSH config
 
 ---
 
@@ -125,38 +111,11 @@ Host lanta-transfer
 ssh lanta-transfer
 ```
 
-ต่อไปนี้ไม่ต้องพิมพ์ host ยาว ๆ แล้ว
+ต่อไปนี้ไม่ต้องพิมพ์ host ยาวๆ แล้ว
 
 ---
 
-## 4. ใช้ Makefile บน Windows
-
-ถ้าใช้ Git Bash และมี `make`:
-
-```bash
-make ssh
-make upload-code
-make job-cpu
-make job-gpu
-```
-
-ถ้าใช้ PowerShell และไม่มี `make` ให้ใช้ command ตรง เช่น:
-
-```powershell
-ssh lanta-transfer
-scp .\src\check_env.py lanta-transfer:~/projects/lpr-hackathon/src/
-```
-
-ตัวอย่าง config ใน Makefile ที่ควรแก้:
-
-```makefile
-REMOTE_HOST=lanta-transfer
-REMOTE_PROJECT=~/projects/lpr-hackathon
-```
-
----
-
-## 5. สร้าง project folder บน LANTA
+## 4. สร้าง project folder บน LANTA
 
 เข้า LANTA:
 
@@ -166,17 +125,16 @@ ssh lanta-transfer
 
 บน LANTA:
 
+Private Path : /home/<USERNAME>
+Shared Path ทุกบ้าน : /project/992000-zdevb/
+Shared Path สำหรับบ้าน Pangpuriye : /project/992000-zdevb/zz992005
+
 ```bash
-mkdir -p ~/projects/lpr-hackathon/{data,src,slurm,outputs,logs,models}
-cd ~/projects/lpr-hackathon
+mkdir -p ~/project/992000-zdevb/zz992005/<USERNAME>/{data,src,slurm,outputs,logs,models}
+cd ~/project/992000-zdevb/zz992005/<USERNAME>
 pwd
 ls -la
 ```
-
-สิ่งที่ได้:
-
-- โครงสร้าง project ชัด
-- แยก data/code/output/log ไม่ปนกัน
 
 ---
 
