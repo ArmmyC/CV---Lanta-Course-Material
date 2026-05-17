@@ -13,12 +13,12 @@
 | Private path | `/home/<USERNAME>` |
 | Shared path รวม | `/project/992000-zdevb/` |
 | Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005` |
-| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon` |
+| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>/test` |
 
 ในคำสั่งด้านล่าง เราจะใช้ project path นี้เป็นหลัก:
 
 ```bash
-/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon
+/project/992000-zdevb/zz992005/<USERNAME>/test
 ```
 
 
@@ -144,8 +144,8 @@ ssh lanta-transfer
 บน LANTA:
 
 ```bash
-mkdir -p /project/992000-zdevb/zz992005/$USER/lpr-hackathon/{data,src,slurm,outputs,logs,models}
-cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
+mkdir -p /project/992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
+cd /project/992000-zdevb/zz992005/$USER/test
 pwd
 ls -la
 ```
