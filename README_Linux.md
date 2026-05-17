@@ -13,7 +13,7 @@
 | Private path | `/home/<USERNAME>` |
 | Shared path รวม | `/project/992000-zdevb/` |
 | Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005` |
-| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>/test` |
+| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>` |
 
 ในคำสั่งด้านล่าง เราจะใช้ project path นี้เป็นหลัก:
 
