@@ -1,18 +1,13 @@
-name: cvhack
+name: lanta-cv
 channels:
   - conda-forge
+  - defaults
 dependencies:
   - python=3.10
   - pip
   - numpy
   - pandas
   - matplotlib
-  - scikit-learn
   - pillow
-  - tqdm
-  - pyyaml
-  - jupyter
-  - nbconvert
   - pip:
-      - ultralytics
-      - opencv-python-headless
+      - -r requirements.txt

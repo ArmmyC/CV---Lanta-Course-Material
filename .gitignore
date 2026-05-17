@@ -1,12 +1,9 @@
-__pycache__/
-*.pyc
-.env
-.venv/
-outputs_lanta/
-outputs/
-models/
-logs/
 data/
+outputs/
+logs/
+models/
 *.pt
 *.onnx
 *.engine
+__pycache__/
+.ipynb_checkpoints/

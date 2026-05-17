@@ -1,11 +1,7 @@
 ultralytics
-opencv-python-headless
+opencv-python
 pandas
-numpy
 matplotlib
-scikit-learn
-pillow
 tqdm
-pyyaml
-jupyter
-nbconvert
+scikit-learn
+Pillow
