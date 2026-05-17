@@ -1,13 +1,16 @@
 name: lanta-cv
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - python=3.10
   - pip
   - numpy
   - pandas
   - matplotlib
-  - pillow
+  - scikit-learn
+  - tqdm
   - pip:
-      - -r requirements.txt
+      - ultralytics
+      - opencv-python
+      - pillow
+      - pyyaml

@@ -11,7 +11,9 @@
 
 set -e
 
-cd ~/projects/lpr-hackathon
+PROJECT_DIR="/project/992000-zdevb/zz992005/${USER}/lpr-hackathon"
+cd "$PROJECT_DIR"
+
 source ~/.bashrc
 conda activate lanta-cv
 

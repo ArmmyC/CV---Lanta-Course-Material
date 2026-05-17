@@ -1,36 +1,47 @@
 # README macOS: ใช้ LANTA สำหรับ Computer Vision Hackathon
 
-คู่มือนี้เหมาะกับ macOS โดยใช้ Terminal, iTerm2 หรือ VS Code terminal
+คู่มือนี้เหมาะกับ macOS โดยใช้ Terminal หรือ iTerm2
 
-> เปลี่ยน `<USERNAME>` เป็น username ของคุณ  
-> Host: `transfer.lanta.nstda.or.th`
+> เปลี่ยน `<USERNAME>` เป็น username ของคุณบน LANTA  
+> Host: `transfer.lanta.nstda.or.th`  
+> Alias ที่จะใช้หลังตั้งค่า SSH config: `lanta-transfer`
+
+## Path ที่ใช้ใน workshop นี้
+
+| ประเภท | Path |
+|---|---|
+| Private path | `/home/<USERNAME>` |
+| Shared path รวม | `/project/992000-zdevb/` |
+| Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005` |
+| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon` |
+
+ในคำสั่งด้านล่าง เราจะใช้ project path นี้เป็นหลัก:
+
+```bash
+/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon
+```
+
 
 ## 0. สิ่งที่ต้องมีบน macOS
 
-macOS มี `ssh` และ `scp` มาให้แล้วโดยปกติ
-
-ตรวจ:
+macOS มี `ssh` และ `scp` มาให้แล้ว ตรวจด้วย:
 
 ```bash
 ssh -V
-scp -V
 git --version
-make --version
 ```
 
-ถ้ายังไม่มี Git หรือ make อาจต้องติดตั้ง Xcode Command Line Tools:
+ถ้าไม่มี git ให้ติดตั้ง Xcode Command Line Tools:
 
 ```bash
 xcode-select --install
 ```
 
-แนะนำเพิ่มเติม:
+ถ้าต้องการ Homebrew:
 
 ```bash
-brew --version
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
-
-ถ้าไม่มี Homebrew แต่ไม่จำเป็นสำหรับ workshop ก็ข้ามได้
 
 ---
 
@@ -40,7 +51,7 @@ brew --version
 ssh <USERNAME>@transfer.lanta.nstda.or.th
 ```
 
-หลังเข้าได้:
+หลังเข้าได้ ให้ลอง:
 
 ```bash
 hostname
@@ -56,12 +67,10 @@ exit
 
 ---
 
-## 2. สร้าง SSH key
-
-บนเครื่อง Mac:
+## 2. สร้าง SSH key เพื่อไม่ต้องพิมพ์ password ทุกครั้ง
 
 ```bash
-ssh-keygen -t ed25519 -C "<USERNAME>@lanta" -f ~/.ssh/lanta_ed25519
+ssh-keygen -t ed25519 -C "lanta" -f ~/.ssh/lanta_ed25519
 ```
 
 ดู public key:
@@ -70,13 +79,7 @@ ssh-keygen -t ed25519 -C "<USERNAME>@lanta" -f ~/.ssh/lanta_ed25519
 cat ~/.ssh/lanta_ed25519.pub
 ```
 
-เพิ่ม public key ไป LANTA:
-
-```bash
-ssh-copy-id -i ~/.ssh/lanta_ed25519.pub <USERNAME>@transfer.lanta.nstda.or.th
-```
-
-ถ้า macOS ไม่มี `ssh-copy-id`:
+เพิ่ม public key ไปที่ LANTA:
 
 ```bash
 cat ~/.ssh/lanta_ed25519.pub | ssh <USERNAME>@transfer.lanta.nstda.or.th "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 700 ~/.ssh && chmod 600 ~/.ssh/authorized_keys"
@@ -113,7 +116,6 @@ Host lanta-transfer
 ```bash
 chmod 700 ~/.ssh
 chmod 600 ~/.ssh/config
-chmod 600 ~/.ssh/lanta_ed25519
 ```
 
 ทดสอบ:
@@ -124,29 +126,7 @@ ssh lanta-transfer
 
 ---
 
-## 4. ใช้ Makefile
-
-แก้ค่าด้านบนของ `Makefile`:
-
-```makefile
-REMOTE_HOST=lanta-transfer
-REMOTE_PROJECT=~/projects/lpr-hackathon
-```
-
-ใช้ command สั้น:
-
-```bash
-make ssh
-make upload-code
-make upload-data
-make job-cpu
-make job-gpu
-make download-output
-```
-
----
-
-## 5. สร้าง project folder บน LANTA
+## 4. สร้าง project folder บน LANTA
 
 ```bash
 ssh lanta-transfer
@@ -155,49 +135,96 @@ ssh lanta-transfer
 บน LANTA:
 
 ```bash
-mkdir -p ~/projects/lpr-hackathon/{data,src,slurm,outputs,logs,models}
-cd ~/projects/lpr-hackathon
+mkdir -p /project/992000-zdevb/zz992005/$USER/lpr-hackathon/{data,src,slurm,outputs,logs,models}
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
 pwd
 ls -la
 ```
 
 ---
 
-## 6. Permission ที่ควรรู้
-
-บน LANTA:
+## 5. Permission ที่ควรรู้: chmod
 
 ```bash
 chmod 700 ~/.ssh
 chmod 600 ~/.ssh/authorized_keys
-chmod +x src/*.py
-```
-
-ดู permission:
-
-```bash
-ls -la
-ls -la ~/.ssh
+chmod +x src/*.py 2>/dev/null || true
 ```
 
 ---
 
-## 7. สร้าง environment ด้วย mamba/conda
+## 6. Upload ไฟล์ template ไป LANTA
+
+จากเครื่องเรา:
+
+```bash
+scp ./requirements.txt lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+scp ./environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+scp -r ./src/ ./slurm/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+```
+
+---
+
+## 7. Upload data ไป LANTA ด้วย scp
+
+```bash
+scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/data/
+```
+
+ถ้า data ใหญ่มาก:
+
+```bash
+zip -r data.zip data/
+scp data.zip lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+```
 
 บน LANTA:
 
 ```bash
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
+unzip data.zip -d .
+```
+
+ถ้ามี `rsync`:
+
+```bash
+rsync -avP ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/data/
+```
+
+---
+
+## 8. Upload ไฟล์ `.py` หรือ `.ipynb`
+
+```bash
+scp ./src/train.py lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/src/
+scp ./notebooks/experiment.ipynb lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/src/
+```
+
+บน LANTA:
+
+```bash
+ls -lh /project/992000-zdevb/zz992005/$USER/lpr-hackathon/src/
+```
+
+---
+
+## 9. สร้าง environment ด้วย mamba/conda
+
+บน LANTA:
+
+```bash
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
 mamba --version || true
 conda --version || true
 ```
 
-สร้าง env:
+ถ้ามี mamba:
 
 ```bash
 mamba env create -f environment.yml
 ```
 
-ถ้าไม่มี mamba:
+ถ้าไม่มี:
 
 ```bash
 conda env create -f environment.yml
@@ -209,7 +236,7 @@ Activate:
 conda activate lanta-cv
 ```
 
-เช็ก:
+เช็ก Python:
 
 ```bash
 which python
@@ -218,221 +245,122 @@ python --version
 
 ---
 
-## 8. ติดตั้ง library ด้วย pip
+## 10. ติดตั้ง library ด้วย pip
 
 ```bash
 pip install -r requirements.txt
-```
-
-หรือ:
-
-```bash
-pip install ultralytics opencv-python pandas matplotlib tqdm scikit-learn
-```
-
-ทดสอบ:
-
-```bash
 python -c "import cv2, pandas, ultralytics; print('OK')"
 ```
 
 ---
 
-## 9. Upload data/code ไป LANTA
-
-จากเครื่อง Mac:
+## 11. ส่ง Slurm job แบบ CPU
 
 ```bash
-scp -r ./data/ lanta-transfer:~/projects/lpr-hackathon/data/
-scp -r ./src/ ./slurm/ lanta-transfer:~/projects/lpr-hackathon/
-scp ./requirements.txt ./environment.yml lanta-transfer:~/projects/lpr-hackathon/
-```
-
-ถ้าไฟล์ใหญ่ ใช้ rsync:
-
-```bash
-rsync -avP ./data/ lanta-transfer:~/projects/lpr-hackathon/data/
-```
-
-Upload notebook หรือ script:
-
-```bash
-scp ./notebooks/experiment.ipynb lanta-transfer:~/projects/lpr-hackathon/src/
-scp ./src/train.py lanta-transfer:~/projects/lpr-hackathon/src/
-```
-
----
-
-## 10. Slurm template สำหรับ CPU
-
-ไฟล์: `slurm/run_cpu.sbatch`
-
-```bash
-#!/bin/bash
-#SBATCH --job-name=cv_cpu_test
-#SBATCH --partition=cpu
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=16G
-#SBATCH --time=01:00:00
-#SBATCH --output=logs/%x-%j.out
-#SBATCH --error=logs/%x-%j.err
-
-set -e
-
-cd ~/projects/lpr-hackathon
-source ~/.bashrc
-conda activate lanta-cv
-
-python src/check_env.py
-```
-
-ส่ง job:
-
-```bash
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
 sbatch slurm/run_cpu.sbatch
 ```
 
 ---
 
-## 11. Slurm template สำหรับ GPU
-
-ไฟล์: `slurm/run_gpu.sbatch`
+## 12. ส่ง Slurm job แบบ GPU
 
 ```bash
-#!/bin/bash
-#SBATCH --job-name=cv_gpu_train
-#SBATCH --partition=gpu
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=32G
-#SBATCH --gres=gpu:1
-#SBATCH --time=04:00:00
-#SBATCH --output=logs/%x-%j.out
-#SBATCH --error=logs/%x-%j.err
-
-set -e
-
-cd ~/projects/lpr-hackathon
-source ~/.bashrc
-conda activate lanta-cv
-
-python src/train_yolo_example.py
-```
-
-ส่ง job:
-
-```bash
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
 sbatch slurm/run_gpu.sbatch
 ```
 
-ถ้า partition ไม่ตรง:
+ถ้า partition ไม่ตรง ให้เช็ก:
 
 ```bash
 sinfo
 ```
 
-แล้วแก้ `#SBATCH --partition=...`
-
 ---
 
-## 12. ดู job, log, cancel
+## 13. ดูสถานะ job, log, cancel job
 
 ```bash
 squeue -u $USER
 sinfo
-```
-
-ดู log:
-
-```bash
 ls -lh logs/
 tail -f logs/cv_gpu_train-<JOB_ID>.out
-```
-
-ยกเลิก:
-
-```bash
 scancel <JOB_ID>
 ```
 
 ---
 
-## 13. Download output กลับ Mac
+## 14. Download output กลับ macOS
 
 ```bash
-scp -r lanta-transfer:~/projects/lpr-hackathon/outputs/ ./outputs/
-scp -r lanta-transfer:~/projects/lpr-hackathon/logs/ ./logs/
-scp -r lanta-transfer:~/projects/lpr-hackathon/models/ ./models/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/outputs/ ./outputs/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/logs/ ./logs/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/models/ ./models/
 ```
 
-หรือ:
+หรือใช้ rsync:
 
 ```bash
-rsync -avP lanta-transfer:~/projects/lpr-hackathon/outputs/ ./outputs/
+rsync -avP lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/outputs/ ./outputs/
 ```
 
 ---
 
-## 14. Computer Vision workflow บน LANTA
+## 15. Computer Vision workflow บน LANTA
 
 ```text
-เตรียม dataset local
-→ upload ไป LANTA
-→ activate env
-→ submit GPU job
-→ train YOLO / run inference
-→ save outputs
+local machine
+→ เตรียม dataset
+→ upload data ไป shared path
+→ train YOLO ด้วย Slurm GPU
+→ save model best.pt ใน models/
+→ run inference
+→ save annotated images ใน outputs/
 → download outputs กลับมา
 ```
 
-คำสั่งตรวจ GPU ใน job script:
+เช็ก CUDA ใน job log:
 
 ```bash
-python -c "import torch; print('CUDA:', torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'No GPU')"
+python -c "import torch; print(torch.cuda.is_available())"
 nvidia-smi || true
 ```
 
 ---
 
-## 15. Troubleshooting macOS
+## 16. Troubleshooting macOS
 
 | ปัญหา | วิธีแก้ |
 |---|---|
-| `make` หรือ `git` ไม่มี | รัน `xcode-select --install` |
-| `ssh-copy-id` ไม่มี | ใช้วิธี `cat key | ssh ...` ตามด้านบน |
-| `Permission denied` | เช็ก key path และ permission ใน `~/.ssh` |
-| upload หลุด | ใช้ `rsync -avP` |
-| conda activate ไม่ได้ | `source ~/.bashrc` หรือหา conda init path |
-| job pending | เช็ก `squeue`, `sinfo`, partition, quota |
-| CUDA ไม่เจอ | เช็กว่า job ใช้ GPU partition จริง |
+| `Permission denied (publickey)` | เช็ก `~/.ssh/config`, key file, และ `authorized_keys` |
+| `Bad permissions` | รัน `chmod 700 ~/.ssh && chmod 600 ~/.ssh/config ~/.ssh/lanta_ed25519` |
+| upload ช้ามาก | ใช้ `rsync -avP` หรือ zip data ก่อน |
+| job pending | เช็ก `squeue`, `sinfo`, partition, quota, time limit |
+| conda activate ไม่ได้ | ลอง `source ~/.bashrc` แล้ว `conda activate lanta-cv` |
+| path ไม่เจอ | ใช้ `/project/992000-zdevb/zz992005/$USER/lpr-hackathon` |
 
 ---
 
-## 16. Cheat Sheet macOS
+## 17. Cheat Sheet macOS
 
 ```bash
 ssh <USERNAME>@transfer.lanta.nstda.or.th
-ssh-keygen -t ed25519 -C "<USERNAME>@lanta" -f ~/.ssh/lanta_ed25519
-ssh-copy-id -i ~/.ssh/lanta_ed25519.pub <USERNAME>@transfer.lanta.nstda.or.th
+ssh-keygen -t ed25519 -C "lanta" -f ~/.ssh/lanta_ed25519
 nano ~/.ssh/config
 ssh lanta-transfer
-scp -r ./data/ lanta-transfer:~/projects/lpr-hackathon/data/
-scp -r lanta-transfer:~/projects/lpr-hackathon/outputs/ ./outputs/
+scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/data/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/outputs/ ./outputs/
 ```
 
 บน LANTA:
 
 ```bash
-mkdir -p ~/projects/lpr-hackathon/{data,src,slurm,outputs,logs,models}
-cd ~/projects/lpr-hackathon
+mkdir -p /project/992000-zdevb/zz992005/$USER/lpr-hackathon/{data,src,slurm,outputs,logs,models}
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
 mamba env create -f environment.yml
 conda activate lanta-cv
 pip install -r requirements.txt
 sbatch slurm/run_cpu.sbatch
 sbatch slurm/run_gpu.sbatch
 squeue -u $USER
-tail -f logs/<LOG_FILE>.out
 ```

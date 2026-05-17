@@ -2,17 +2,34 @@
 
 คู่มือนี้เหมาะกับ Windows 10/11 โดยแนะนำให้ใช้ **Windows Terminal + PowerShell** หรือ **Git Bash**
 
-> เปลี่ยน `<USERNAME>` เป็น username ของคุณ  
-> Host: `transfer.lanta.nstda.or.th`
+> เปลี่ยน `<USERNAME>` เป็น username ของคุณบน LANTA  
+> Host: `transfer.lanta.nstda.or.th`  
+> Alias ที่จะใช้หลังตั้งค่า SSH config: `lanta-transfer`
+
+## Path ที่ใช้ใน workshop นี้
+
+| ประเภท | Path |
+|---|---|
+| Private path | `/home/<USERNAME>` |
+| Shared path รวม | `/project/992000-zdevb/` |
+| Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005` |
+| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon` |
+
+ในคำสั่งด้านล่าง เราจะใช้ project path นี้เป็นหลัก:
+
+```bash
+/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon
+```
+
 
 ## 0. สิ่งที่ต้องมีบน Windows
 
 แนะนำติดตั้ง:
 
 - Windows Terminal
-- Git for Windows, เพื่อใช้ Git Bash และ command แบบ Linux
+- Git for Windows เพื่อใช้ Git Bash และ `git`
 - VS Code
-- OpenSSH Client, ปกติ Windows 10/11 มีให้แล้ว
+- OpenSSH Client, ปกติ Windows 10/11 มีมาให้แล้ว
 
 ตรวจใน PowerShell:
 
@@ -26,14 +43,11 @@ git --version
 ```bash
 ssh -V
 git --version
-make --version
 ```
-
-ถ้า `make` ไม่มี ไม่เป็นไร ใช้ command ตรงแทนได้
 
 ---
 
-## 1. SSH เข้า LANTA
+## 1. SSH เข้า LANTA ครั้งแรก
 
 PowerShell:
 
@@ -65,7 +79,7 @@ exit
 ssh-keygen -t ed25519 -C "lanta" -f $env:USERPROFILE\.ssh\lanta_ed25519
 ```
 
-กด Enter ตามขั้นตอน ควรตั้ง passphrase
+กด Enter ตามขั้นตอน แนะนำให้ตั้ง passphrase
 
 ดู public key:
 
@@ -111,7 +125,11 @@ Host lanta-transfer
 ssh lanta-transfer
 ```
 
-ต่อไปนี้ไม่ต้องพิมพ์ host ยาวๆ แล้ว
+จากนี้ให้ใช้คำสั่งสั้น ๆ ได้เลย:
+
+```powershell
+ssh lanta-transfer
+```
 
 ---
 
@@ -125,27 +143,31 @@ ssh lanta-transfer
 
 บน LANTA:
 
-Private Path : /home/<USERNAME>
-Shared Path ทุกบ้าน : /project/992000-zdevb/
-Shared Path สำหรับบ้าน Pangpuriye : /project/992000-zdevb/zz992005
-
 ```bash
-mkdir -p ~/project/992000-zdevb/zz992005/<USERNAME>/{data,src,slurm,outputs,logs,models}
-cd ~/project/992000-zdevb/zz992005/<USERNAME>
+mkdir -p /project/992000-zdevb/zz992005/$USER/lpr-hackathon/{data,src,slurm,outputs,logs,models}
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
 pwd
 ls -la
 ```
 
+ถ้าอยากเช็กว่าอยู่ shared path ถูกไหม:
+
+```bash
+echo $USER
+pwd
+df -h .
+```
+
 ---
 
-## 6. Permission ที่ควรรู้: chmod
+## 5. Permission ที่ควรรู้: chmod
 
 บน LANTA:
 
 ```bash
 chmod 700 ~/.ssh
 chmod 600 ~/.ssh/authorized_keys
-chmod +x src/*.py
+chmod +x src/*.py 2>/dev/null || true
 ```
 
 ความหมายสั้น ๆ:
@@ -153,21 +175,92 @@ chmod +x src/*.py
 | Command | ใช้ทำอะไร |
 |---|---|
 | `chmod 700 ~/.ssh` | ให้เจ้าของอ่าน/เขียน/เข้า folder ได้คนเดียว |
-| `chmod 600 authorized_keys` | ให้เจ้าของอ่าน/เขียน key file ได้คนเดียว |
-| `chmod +x file.py` | ทำให้ file execute ได้ |
+| `chmod 600 ~/.ssh/authorized_keys` | ให้เจ้าของอ่าน/เขียน key file ได้คนเดียว |
+| `chmod +x src/*.py` | ทำให้ Python script execute ได้ |
 
 ---
 
-## 7. สร้าง environment ด้วย mamba/conda
+## 6. Upload ไฟล์ template ไป LANTA
 
-เช็กว่ามี mamba/conda ไหม:
+ให้เปิด PowerShell ที่ root folder ของ repo นี้ แล้วรัน:
 
-```bash
-mamba --version
-conda --version
+```powershell
+scp .\requirements.txt lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+scp .\environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+scp -r .\src\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+scp -r .\slurm\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
 ```
 
-ถ้ามี `environment.yml`:
+ถ้าใช้ Git Bash:
+
+```bash
+scp ./requirements.txt lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+scp ./environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+scp -r ./src/ ./slurm/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+```
+
+---
+
+## 7. Upload data ไป LANTA ด้วย scp
+
+PowerShell:
+
+```powershell
+scp -r .\data\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/data/
+```
+
+Git Bash:
+
+```bash
+scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/data/
+```
+
+ถ้า data ใหญ่มาก แนะนำ zip ก่อน:
+
+```powershell
+Compress-Archive -Path .\data\* -DestinationPath data.zip
+scp .\data.zip lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+```
+
+บน LANTA:
+
+```bash
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
+unzip data.zip -d data
+```
+
+---
+
+## 8. Upload ไฟล์ `.py` หรือ `.ipynb`
+
+PowerShell:
+
+```powershell
+scp .\src\train.py lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/src/
+scp .\notebooks\experiment.ipynb lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/src/
+```
+
+บน LANTA เช็กไฟล์:
+
+```bash
+ls -lh /project/992000-zdevb/zz992005/$USER/lpr-hackathon/src/
+```
+
+หมายเหตุ: บน HPC มักนิยมรัน `.py` ผ่าน Slurm มากกว่า `.ipynb` ถ้ามี notebook ให้ export เป็น Python script ก่อน
+
+---
+
+## 9. สร้าง environment ด้วย mamba/conda
+
+บน LANTA:
+
+```bash
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
+mamba --version || true
+conda --version || true
+```
+
+ถ้ามี `mamba`:
 
 ```bash
 mamba env create -f environment.yml
@@ -194,7 +287,7 @@ python --version
 
 ---
 
-## 8. ติดตั้ง library ด้วย pip
+## 10. ติดตั้ง library ด้วย pip
 
 บน LANTA หลัง activate env:
 
@@ -216,51 +309,6 @@ python -c "import cv2, pandas, ultralytics; print('OK')"
 
 ---
 
-## 9. Upload data ไป LANTA ด้วย scp
-
-PowerShell จากเครื่องเรา:
-
-```powershell
-scp -r .\data\ lanta-transfer:~/projects/lpr-hackathon/data/
-```
-
-Upload code:
-
-```powershell
-scp -r .\src\ lanta-transfer:~/projects/lpr-hackathon/
-scp -r .\slurm\ lanta-transfer:~/projects/lpr-hackathon/
-scp .\requirements.txt lanta-transfer:~/projects/lpr-hackathon/
-scp .\environment.yml lanta-transfer:~/projects/lpr-hackathon/
-```
-
-ถ้าใช้ Git Bash ใช้ path แบบนี้ได้:
-
-```bash
-scp -r ./data/ lanta-transfer:~/projects/lpr-hackathon/data/
-scp -r ./src/ ./slurm/ lanta-transfer:~/projects/lpr-hackathon/
-```
-
----
-
-## 10. Upload ไฟล์ `.py` หรือ `.ipynb`
-
-PowerShell:
-
-```powershell
-scp .\notebooks\experiment.ipynb lanta-transfer:~/projects/lpr-hackathon/src/
-scp .\src\train.py lanta-transfer:~/projects/lpr-hackathon/src/
-```
-
-บน LANTA เช็กไฟล์:
-
-```bash
-ls -lh ~/projects/lpr-hackathon/src/
-```
-
-หมายเหตุ: บน HPC มักนิยมรัน `.py` ผ่าน Slurm มากกว่า `.ipynb` ถ้ามี notebook ให้ export เป็น Python script ก่อน
-
----
-
 ## 11. Slurm template สำหรับ CPU
 
 ไฟล์: `slurm/run_cpu.sbatch`
@@ -279,7 +327,9 @@ ls -lh ~/projects/lpr-hackathon/src/
 
 set -e
 
-cd ~/projects/lpr-hackathon
+PROJECT_DIR="/project/992000-zdevb/zz992005/${USER}/lpr-hackathon"
+cd "$PROJECT_DIR"
+
 source ~/.bashrc
 conda activate lanta-cv
 
@@ -313,7 +363,9 @@ sbatch slurm/run_cpu.sbatch
 
 set -e
 
-cd ~/projects/lpr-hackathon
+PROJECT_DIR="/project/992000-zdevb/zz992005/${USER}/lpr-hackathon"
+cd "$PROJECT_DIR"
+
 source ~/.bashrc
 conda activate lanta-cv
 
@@ -326,7 +378,11 @@ python src/train_yolo_example.py
 sbatch slurm/run_gpu.sbatch
 ```
 
-> ถ้า partition ไม่ใช่ `gpu` ให้เช็กด้วย `sinfo`
+ถ้า partition ไม่ใช่ `gpu` ให้เช็กด้วย:
+
+```bash
+sinfo
+```
 
 ---
 
@@ -359,17 +415,17 @@ scancel <JOB_ID>
 PowerShell:
 
 ```powershell
-scp -r lanta-transfer:~/projects/lpr-hackathon/outputs/ .\outputs\
-scp -r lanta-transfer:~/projects/lpr-hackathon/logs/ .\logs\
-scp -r lanta-transfer:~/projects/lpr-hackathon/models/ .\models\
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/outputs/ .\outputs\
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/logs/ .\logs\
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/models/ .\models\
 ```
 
 Git Bash:
 
 ```bash
-scp -r lanta-transfer:~/projects/lpr-hackathon/outputs/ ./outputs/
-scp -r lanta-transfer:~/projects/lpr-hackathon/logs/ ./logs/
-scp -r lanta-transfer:~/projects/lpr-hackathon/models/ ./models/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/outputs/ ./outputs/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/logs/ ./logs/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/models/ ./models/
 ```
 
 ---
@@ -381,7 +437,7 @@ scp -r lanta-transfer:~/projects/lpr-hackathon/models/ ./models/
 ```text
 local machine
 → เตรียม dataset
-→ upload data ไป LANTA
+→ upload data ไป LANTA shared path
 → train YOLO ด้วย Slurm GPU
 → save model best.pt ใน models/
 → run inference
@@ -389,15 +445,14 @@ local machine
 → download outputs กลับมา
 ```
 
-สิ่งที่ควรให้ทีมดู:
+สิ่งที่ควรให้ทีมดูใน job log:
 
 ```bash
 python -c "import torch; print(torch.cuda.is_available())"
 nvidia-smi || true
-tegrastats || true
 ```
 
-บางเครื่อง login node อาจไม่มี GPU ให้เช็ก GPU ใน job log แทน
+บางครั้ง login node อาจไม่มี GPU ให้เช็ก GPU ใน job log ของ Slurm แทน
 
 ---
 
@@ -407,30 +462,32 @@ tegrastats || true
 |---|---|
 | `ssh` ใช้ไม่ได้ | เปิด Optional Features แล้วติดตั้ง OpenSSH Client หรือใช้ Git Bash |
 | `Permission denied (publickey)` | เช็ก path key ใน `~/.ssh/config`, เช็ก `authorized_keys` บน LANTA |
-| `scp` path ผิด | PowerShell ใช้ `.olderile`, Git Bash ใช้ `./folder/file` |
-| `make` ไม่มี | ใช้ Git Bash/MSYS2 หรือรัน command ตรงแทน |
-| upload ช้ามาก | zip data ก่อน หรือใช้ rsync ถ้ามี |
+| `scp` path ผิด | PowerShell ใช้ `.\folder\file`, Git Bash ใช้ `./folder/file` |
+| upload ช้ามาก | zip data ก่อน หรือใช้ `rsync` ถ้ามีใน Git Bash |
 | conda activate ไม่ได้ | ลอง `source ~/.bashrc` แล้ว `conda activate lanta-cv` |
 | job pending | เช็ก `squeue`, `sinfo`, partition, quota, time limit |
+| `No such file or directory` | เช็กว่า path เป็น `/project/992000-zdevb/zz992005/$USER/lpr-hackathon` ไม่ใช่ `~/projects/...` |
 
 ---
 
 ## 17. Cheat Sheet Windows
 
+PowerShell:
+
 ```powershell
 ssh <USERNAME>@transfer.lanta.nstda.or.th
-ssh-keygen -t ed25519 -C "<USERNAME>@lanta" -f $env:USERPROFILE\.ssh\lanta_ed25519
+ssh-keygen -t ed25519 -C "lanta" -f $env:USERPROFILE\.ssh\lanta_ed25519
 notepad $env:USERPROFILE\.ssh\config
 ssh lanta-transfer
-scp -r .\data\ lanta-transfer:~/projects/lpr-hackathon/data/
-scp -r lanta-transfer:~/projects/lpr-hackathon/outputs/ .\outputs\
+scp -r .\data\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/data/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/outputs/ .\outputs\
 ```
 
 บน LANTA:
 
 ```bash
-mkdir -p ~/projects/lpr-hackathon/{data,src,slurm,outputs,logs,models}
-cd ~/projects/lpr-hackathon
+mkdir -p /project/992000-zdevb/zz992005/$USER/lpr-hackathon/{data,src,slurm,outputs,logs,models}
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
 mamba env create -f environment.yml
 conda activate lanta-cv
 pip install -r requirements.txt

@@ -1,98 +1,136 @@
-# Workshop: ใช้ LANTA สำหรับ Computer Vision Hackathon
+# LANTA Computer Vision Workshop
 
-เอกสารชุดนี้แยกตามระบบปฏิบัติการ เพื่อให้ทีมกดตามได้ง่ายระหว่าง workshop
+คู่มือนี้ใช้สำหรับสอนทีมให้ใช้งาน **LANTA** สำหรับงาน Computer Vision Hackathon เช่น license plate detection, object detection, YOLO training, inference และการส่งงานผ่าน Slurm
 
-> เปลี่ยน `<USERNAME>` เป็น username ของแต่ละคนก่อนรัน command  
-> Host ตัวอย่าง: `transfer.lanta.nstda.or.th`  
-> ชื่อ partition/account ของ LANTA อาจต่างจาก template ให้เช็กด้วย `sinfo`, `squeue`, `sacctmgr` หรือถาม TA/ผู้ดูแลระบบ
+## เลือกระบบปฏิบัติการ
 
-## เลือกคู่มือของคุณ
+- [Windows Guide](./README_Windows.md)
+- [Linux Guide](./README_Linux.md)
+- [macOS Guide](./README_Mac.md)
 
-| ระบบ    | ไฟล์                                   |
-| ------- | -------------------------------------- |
-| Windows | [README_Windows.md](README_Windows.md) |
-| Linux   | [README_Linux.md](README_Linux.md)     |
-| macOS   | [README_Mac.md](README_Mac.md)         |
+## สิ่งที่จะได้เรียน
 
-## ไฟล์ template ที่ให้มา
+1. SSH เข้า LANTA
+2. สร้าง SSH key เพื่อไม่ต้องพิมพ์ password ทุกครั้ง
+3. ตั้งค่า SSH config ให้ใช้ `ssh lanta-transfer`
+4. สร้าง project folder ใน shared path
+5. ตั้ง permission ที่จำเป็น
+6. สร้าง Python environment ด้วย mamba/conda
+7. ติดตั้ง library ด้วย pip
+8. upload data/code ไป LANTA ด้วย `scp`
+9. เขียนและส่ง Slurm job สำหรับ CPU/GPU
+10. ดูสถานะ job และ log
+11. download output กลับเครื่องตัวเอง
+12. workflow สำหรับ Computer Vision บน LANTA
 
-| ไฟล์                                                   | ใช้ทำอะไร                                                              |
-| ------------------------------------------------------ | ---------------------------------------------------------------------- |
-| [Makefile](Makefile)                                   | รวม command สั้น ๆ เช่น `make ssh`, `make upload-code`, `make job-gpu` |
-| [environment.yml](environment.yml)                     | สร้าง conda/mamba environment                                          |
-| [requirements.txt](requirements.txt)                   | ติดตั้ง Python libraries ด้วย pip                                      |
-| [slurm/run_cpu.sbatch](slurm/run_cpu.sbatch)           | Template สำหรับส่งงาน CPU                                              |
-| [slurm/run_gpu.sbatch](slurm/run_gpu.sbatch)           | Template สำหรับส่งงาน GPU                                              |
-| [src/check_env.py](src/check_env.py)                   | Script ทดสอบ environment                                               |
-| [src/train_yolo_example.py](src/train_yolo_example.py) | ตัวอย่าง script สำหรับงาน Computer Vision / YOLO                       |
+> เปลี่ยน `<USERNAME>` เป็น username ของคุณบน LANTA  
+> Host: `transfer.lanta.nstda.or.th`  
+> Alias ที่จะใช้หลังตั้งค่า SSH config: `lanta-transfer`
 
-## Flow ที่จะสอน
+## Path ที่ใช้ใน workshop นี้
 
-```text
-เครื่องเรา
-→ SSH เข้า LANTA transfer/login node
-→ สร้าง SSH key และ config
-→ สร้าง project folder
-→ สร้าง Python environment
-→ upload data/code ด้วย scp
-→ submit job ด้วย Slurm
-→ ดู log และผลลัพธ์
-→ download output กลับเครื่องเรา
+| ประเภท | Path |
+|---|---|
+| Private path | `/home/<USERNAME>` |
+| Shared path รวม | `/project/992000-zdevb/` |
+| Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005` |
+| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon` |
+
+ในคำสั่งด้านล่าง เราจะใช้ project path นี้เป็นหลัก:
+
+```bash
+/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon
 ```
 
-## สิ่งสำคัญ
 
-- อย่ารัน train model หนัก ๆ บน transfer/login node โดยตรง
-- งาน train/inference หนักให้ส่งผ่าน Slurm
-- Private key ห้ามส่งให้ใคร
-- ตั้งชื่อ folder ให้ชัด เช่น `~/projects/lpr-hackathon`
-- เก็บ `data/`, `src/`, `slurm/`, `outputs/`, `logs/` แยกกัน
-- เริ่มจาก script เล็ก ๆ เช่น `check_env.py` ก่อน train model จริง
-
-## โครงสร้าง project ที่แนะนำบน LANTA
+## โครงสร้าง repository ที่แนะนำ
 
 ```text
-~/projects/lpr-hackathon/
+lpr-hackathon/
+├── README.md
+├── README_Windows.md
+├── README_Linux.md
+├── README_Mac.md
+├── environment.yml
+├── requirements.txt
 ├── data/
-├── src/
-├── slurm/
+├── models/
 ├── outputs/
 ├── logs/
-├── models/
-├── requirements.txt
-└── environment.yml
+├── slurm/
+│   ├── run_cpu.sbatch
+│   └── run_gpu.sbatch
+└── src/
+    ├── check_env.py
+    └── train_yolo_example.py
 ```
 
-## Workflow สำหรับ Computer Vision บน LANTA
+## Flow การสอนที่แนะนำ
 
-```text
-1. เตรียม dataset บนเครื่องเรา
-2. upload dataset ไป LANTA ด้วย scp หรือ rsync
-3. สร้าง environment ด้วย mamba/conda
-4. ติดตั้ง library เช่น ultralytics, opencv-python, pandas
-5. รัน check_env.py ด้วย Slurm CPU ก่อน
-6. รัน train/inference ด้วย Slurm GPU
-7. ดู log ใน logs/
-8. เก็บผลลัพธ์ใน outputs/
-9. download outputs กลับเครื่องเรา
+### ช่วงที่ 1: Setup local machine
+
+ให้ทุกคนทำตามไฟล์ของ OS ตัวเองก่อน:
+
+- Windows: [README_Windows.md](./README_Windows.md)
+- Linux: [README_Linux.md](./README_Linux.md)
+- macOS: [README_Mac.md](./README_Mac.md)
+
+เป้าหมายคือทุกคนต้องใช้คำสั่งนี้ได้:
+
+```bash
+ssh lanta-transfer
 ```
 
-## Computer Vision
+### ช่วงที่ 2: สร้าง folder บน LANTA
 
-- ตรวจว่า GPU ใช้ได้ไหม
-- โหลด YOLO model ได้ไหม
-- อ่านรูปด้วย OpenCV ได้ไหม
-- predict รูปตัวอย่างได้ไหม
-- output ถูกบันทึกใน `outputs/` ไหม
-- job ใช้ GPU จริงหรือเปล่า
+หลังเข้า LANTA ได้แล้ว ให้สร้าง project folder ใน shared path:
 
-## Slurm command ที่ใช้บ่อย
+```bash
+mkdir -p /project/992000-zdevb/zz992005/$USER/lpr-hackathon/{data,src,slurm,outputs,logs,models}
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
+pwd
+```
+
+### ช่วงที่ 3: Upload code และ data
+
+จากเครื่องเรา:
+
+```bash
+scp -r ./src ./slurm ./requirements.txt ./environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
+scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/data/
+```
+
+### ช่วงที่ 4: สร้าง environment และส่ง job
+
+บน LANTA:
+
+```bash
+cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
+mamba env create -f environment.yml
+conda activate lanta-cv
+pip install -r requirements.txt
+sbatch slurm/run_cpu.sbatch
+sbatch slurm/run_gpu.sbatch
+```
+
+### ช่วงที่ 5: Download output
+
+จากเครื่องเรา:
+
+```bash
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/outputs/ ./outputs/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/logs/ ./logs/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/models/ ./models/
+```
+
+## หมายเหตุสำคัญ
+
+- คู่มือนี้ไม่ใช้ Makefile แล้ว
+- ใช้ SSH config เพื่อให้สั้นเหลือแค่ `ssh lanta-transfer`
+- ชื่อ partition ใน Slurm เช่น `cpu` และ `gpu` เป็น template ให้เช็กของจริงด้วย:
 
 ```bash
 sinfo
 squeue -u $USER
-sbatch slurm/run_cpu.sbatch
-sbatch slurm/run_gpu.sbatch
-scancel <JOB_ID>
-tail -f logs/<LOG_FILE>.out
 ```
+

@@ -1,9 +1,13 @@
+__pycache__/
+*.pyc
+.env
+.venv/
 data/
 outputs/
 logs/
 models/
+runs/
 *.pt
-*.onnx
 *.engine
-__pycache__/
-.ipynb_checkpoints/
+*.onnx
+.DS_Store
