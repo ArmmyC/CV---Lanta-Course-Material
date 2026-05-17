@@ -1,6 +1,6 @@
-# LANTA Computer Vision Workshop
+# LANTA Workshop
 
-คู่มือนี้ใช้สำหรับสอนทีมให้ใช้งาน **LANTA** สำหรับงาน Computer Vision Hackathon เช่น license plate detection, object detection, YOLO training, inference และการส่งงานผ่าน Slurm
+คู่มือนี้ใช้สำหรับสอนทีมให้ใช้งาน **LANTA**
 
 ## เลือกระบบปฏิบัติการ
 
@@ -21,7 +21,6 @@
 9. เขียนและส่ง Slurm job สำหรับ CPU/GPU
 10. ดูสถานะ job และ log
 11. download output กลับเครื่องตัวเอง
-12. workflow สำหรับ Computer Vision บน LANTA
 
 > เปลี่ยน `<USERNAME>` เป็น username ของคุณบน LANTA  
 > Host: `transfer.lanta.nstda.or.th`  
@@ -34,19 +33,19 @@
 | Private path | `/home/<USERNAME>` |
 | Shared path รวม | `/project/992000-zdevb/` |
 | Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005` |
-| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon` |
+| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>/` |
 
 ในคำสั่งด้านล่าง เราจะใช้ project path นี้เป็นหลัก:
 
 ```bash
-/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon
+/project/992000-zdevb/zz992005/<USERNAME>/test
 ```
 
 
 ## โครงสร้าง repository ที่แนะนำ
 
 ```text
-lpr-hackathon/
+test/
 ├── README.md
 ├── README_Windows.md
 ├── README_Linux.md
@@ -64,8 +63,6 @@ lpr-hackathon/
     ├── check_env.py
     └── train_yolo_example.py
 ```
-
-## Flow การสอนที่แนะนำ
 
 ### ช่วงที่ 1: Setup local machine
 
@@ -86,8 +83,8 @@ ssh lanta-transfer
 หลังเข้า LANTA ได้แล้ว ให้สร้าง project folder ใน shared path:
 
 ```bash
-mkdir -p /project/992000-zdevb/zz992005/$USER/lpr-hackathon/{data,src,slurm,outputs,logs,models}
-cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
+mkdir -p /project/992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
+cd /project/992000-zdevb/zz992005/$USER/test
 pwd
 ```
 
@@ -96,8 +93,8 @@ pwd
 จากเครื่องเรา:
 
 ```bash
-scp -r ./src ./slurm ./requirements.txt ./environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/
-scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/data/
+scp -r ./src ./slurm ./requirements.txt ./environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
+scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/data/
 ```
 
 ### ช่วงที่ 4: สร้าง environment และส่ง job
@@ -105,7 +102,7 @@ scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hack
 บน LANTA:
 
 ```bash
-cd /project/992000-zdevb/zz992005/$USER/lpr-hackathon
+cd /project/992000-zdevb/zz992005/$USER/test
 mamba env create -f environment.yml
 conda activate lanta-cv
 pip install -r requirements.txt
@@ -118,14 +115,13 @@ sbatch slurm/run_gpu.sbatch
 จากเครื่องเรา:
 
 ```bash
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/outputs/ ./outputs/
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/logs/ ./logs/
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/lpr-hackathon/models/ ./models/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/logs/ ./logs/
+scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/models/ ./models/
 ```
 
 ## หมายเหตุสำคัญ
 
-- คู่มือนี้ไม่ใช้ Makefile แล้ว
 - ใช้ SSH config เพื่อให้สั้นเหลือแค่ `ssh lanta-transfer`
 - ชื่อ partition ใน Slurm เช่น `cpu` และ `gpu` เป็น template ให้เช็กของจริงด้วย:
 
