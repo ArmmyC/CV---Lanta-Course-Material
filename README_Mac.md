@@ -163,6 +163,8 @@ scp ./environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/t
 scp -r ./src/ ./slurm/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
 ```
 
+ถ้าไม่มี `requirements.txt` หรือ `environment.yml` ให้ข้ามสองบรรทัดแรก แล้วไปสร้าง environment และติดตั้ง library เองในหัวข้อ 9-10
+
 ---
 
 ## 7. Upload data ไป LANTA ด้วย scp
@@ -218,13 +220,15 @@ mamba --version || true
 conda --version || true
 ```
 
-ถ้ามี mamba:
+### กรณีมีไฟล์ `environment.yml`
+
+ถ้ามี `mamba`:
 
 ```bash
 mamba env create -f environment.yml
 ```
 
-ถ้าไม่มี:
+ถ้าไม่มี `mamba` ใช้ `conda`:
 
 ```bash
 conda env create -f environment.yml
@@ -243,18 +247,119 @@ which python
 python --version
 ```
 
+### กรณีไม่มีไฟล์ `environment.yml`
+
+ให้สร้าง environment เองด้วยชื่อเดียวกับใน workshop:
+
+```bash
+mamba create -n lanta-cv python=3.10 pip -y
+```
+
+ถ้าไม่มี `mamba`:
+
+```bash
+conda create -n lanta-cv python=3.10 pip -y
+```
+
+จากนั้น activate:
+
+```bash
+conda activate lanta-cv
+```
+
+ติดตั้ง library พื้นฐานที่ conda จัดการได้ดี:
+
+```bash
+mamba install -c conda-forge numpy pandas matplotlib scikit-learn tqdm pillow pyyaml -y
+```
+
+ถ้าไม่มี `mamba`:
+
+```bash
+conda install -c conda-forge numpy pandas matplotlib scikit-learn tqdm pillow pyyaml -y
+```
+
 ---
 
 ## 10. ติดตั้ง library ด้วย pip
 
+### กรณีมีไฟล์ `requirements.txt`
+
 ```bash
 pip install -r requirements.txt
+```
+
+### กรณีไม่มีไฟล์ `requirements.txt`
+
+ให้พิมพ์ชื่อ library ที่ต้องใช้เอง:
+
+```bash
+pip install ultralytics opencv-python pandas matplotlib tqdm scikit-learn pillow pyyaml
+```
+
+ถ้าต้องการบันทึกรายการ library ที่ติดตั้งไว้ใช้ซ้ำภายหลัง:
+
+```bash
+pip freeze > requirements.txt
+```
+
+เช็กว่า import ได้ไหม:
+
+```bash
 python -c "import cv2, pandas, ultralytics; print('OK')"
 ```
 
 ---
 
-## 11. ส่ง Slurm job แบบ CPU
+## 11. Slurm template สำหรับ CPU
+
+ไฟล์: `slurm/run_cpu.sbatch`
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=cv_cpu_test
+#SBATCH --partition=cpu
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --time=01:00:00
+#SBATCH --output=logs/%x-%j.out
+#SBATCH --error=logs/%x-%j.err
+
+set -e
+
+PROJECT_DIR="/project/992000-zdevb/zz992005/${USER}/test"
+cd "$PROJECT_DIR"
+
+source ~/.bashrc
+conda activate lanta-cv
+
+python src/check_env.py
+```
+
+คำอธิบายทีละบรรทัด:
+
+| บรรทัด | ความหมาย |
+|---|---|
+| `#!/bin/bash` | บอกระบบให้รันไฟล์นี้ด้วย Bash shell |
+| `#SBATCH --job-name=cv_cpu_test` | ตั้งชื่อ job ให้ดูง่ายใน `squeue` และชื่อ log |
+| `#SBATCH --partition=cpu` | ขอส่งงานเข้า CPU partition |
+| `#SBATCH --nodes=1` | ขอใช้ compute node 1 เครื่อง |
+| `#SBATCH --ntasks=1` | รัน task หลัก 1 task เหมาะกับ Python script ทั่วไป |
+| `#SBATCH --cpus-per-task=4` | ให้ task นี้ใช้ CPU ได้ 4 cores |
+| `#SBATCH --mem=16G` | ขอ RAM 16 GB |
+| `#SBATCH --time=01:00:00` | จำกัดเวลารันสูงสุด 1 ชั่วโมง |
+| `#SBATCH --output=logs/%x-%j.out` | เก็บ stdout ใน `logs/` โดย `%x` คือชื่อ job และ `%j` คือ job id |
+| `#SBATCH --error=logs/%x-%j.err` | เก็บ stderr หรือ error log ใน `logs/` |
+| `set -e` | ถ้าคำสั่งใด fail ให้หยุด job ทันที |
+| `PROJECT_DIR=...` | กำหนด path โปรเจกต์บน shared storage |
+| `cd "$PROJECT_DIR"` | เข้า folder โปรเจกต์ก่อนรันงาน |
+| `source ~/.bashrc` | โหลด shell config เพื่อให้ใช้ `conda activate` ได้ |
+| `conda activate lanta-cv` | เปิด conda environment ที่เตรียมไว้ |
+| `python src/check_env.py` | รัน script สำหรับตรวจ environment |
+
+ส่ง job:
 
 ```bash
 cd /project/992000-zdevb/zz992005/$USER/test
@@ -263,7 +368,59 @@ sbatch slurm/run_cpu.sbatch
 
 ---
 
-## 12. ส่ง Slurm job แบบ GPU
+## 12. Slurm template สำหรับ GPU
+
+ไฟล์: `slurm/run_gpu.sbatch`
+
+```bash
+#!/bin/bash
+#SBATCH --job-name=cv_gpu_train
+#SBATCH --partition=gpu
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=32G
+#SBATCH --gres=gpu:1
+#SBATCH --time=04:00:00
+#SBATCH --output=logs/%x-%j.out
+#SBATCH --error=logs/%x-%j.err
+
+set -e
+
+PROJECT_DIR="/project/992000-zdevb/zz992005/${USER}/test"
+cd "$PROJECT_DIR"
+
+source ~/.bashrc
+conda activate lanta-cv
+
+python src/check_env.py
+python src/train_yolo_example.py
+```
+
+คำอธิบายทีละบรรทัด:
+
+| บรรทัด | ความหมาย |
+|---|---|
+| `#!/bin/bash` | บอกระบบให้รันไฟล์นี้ด้วย Bash shell |
+| `#SBATCH --job-name=cv_gpu_train` | ตั้งชื่อ job สำหรับงาน train ด้วย GPU |
+| `#SBATCH --partition=gpu` | ขอส่งงานเข้า GPU partition |
+| `#SBATCH --nodes=1` | ขอใช้ compute node 1 เครื่อง |
+| `#SBATCH --ntasks=1` | รัน task หลัก 1 task |
+| `#SBATCH --cpus-per-task=8` | ให้ task นี้ใช้ CPU ได้ 8 cores เพื่อช่วยโหลดข้อมูล/เตรียม batch |
+| `#SBATCH --mem=32G` | ขอ RAM 32 GB |
+| `#SBATCH --gres=gpu:1` | ขอ GPU 1 ใบ |
+| `#SBATCH --time=04:00:00` | จำกัดเวลารันสูงสุด 4 ชั่วโมง |
+| `#SBATCH --output=logs/%x-%j.out` | เก็บ stdout ใน `logs/` โดย `%x` คือชื่อ job และ `%j` คือ job id |
+| `#SBATCH --error=logs/%x-%j.err` | เก็บ stderr หรือ error log ใน `logs/` |
+| `set -e` | ถ้าคำสั่งใด fail ให้หยุด job ทันที |
+| `PROJECT_DIR=...` | กำหนด path โปรเจกต์บน shared storage |
+| `cd "$PROJECT_DIR"` | เข้า folder โปรเจกต์ก่อนรันงาน |
+| `source ~/.bashrc` | โหลด shell config เพื่อให้ใช้ `conda activate` ได้ |
+| `conda activate lanta-cv` | เปิด conda environment ที่เตรียมไว้ |
+| `python src/check_env.py` | ตรวจ Python, library, และ GPU ก่อนเริ่ม train |
+| `python src/train_yolo_example.py` | รัน training script ตัวอย่าง |
+
+ส่ง job:
 
 ```bash
 cd /project/992000-zdevb/zz992005/$USER/test

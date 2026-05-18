@@ -8,19 +8,18 @@
 
 ## Path ที่ใช้ใน workshop นี้
 
-| ประเภท | Path |
-|---|---|
-| Private path | `/home/<USERNAME>` |
-| Shared path รวม | `/project/992000-zdevb/` |
-| Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005` |
-| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>` |
+| ประเภท                      | Path                                        |
+| --------------------------- | ------------------------------------------- |
+| Private path                | `/home/<USERNAME>`                          |
+| Shared path รวม             | `/project/992000-zdevb/`                    |
+| Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005`            |
+| Project path ที่แนะนำ       | `/project/992000-zdevb/zz992005/<USERNAME>` |
 
 ในคำสั่งด้านล่าง เราจะใช้ project path นี้เป็นหลัก:
 
 ```bash
 /project/992000-zdevb/zz992005/<USERNAME>/test
 ```
-
 
 ## 0. สิ่งที่ต้องมีบน Windows
 
@@ -172,11 +171,11 @@ chmod +x src/*.py 2>/dev/null || true
 
 ความหมายสั้น ๆ:
 
-| Command | ใช้ทำอะไร |
-|---|---|
-| `chmod 700 ~/.ssh` | ให้เจ้าของอ่าน/เขียน/เข้า folder ได้คนเดียว |
-| `chmod 600 ~/.ssh/authorized_keys` | ให้เจ้าของอ่าน/เขียน key file ได้คนเดียว |
-| `chmod +x src/*.py` | ทำให้ Python script execute ได้ |
+| Command                            | ใช้ทำอะไร                                   |
+| ---------------------------------- | ------------------------------------------- |
+| `chmod 700 ~/.ssh`                 | ให้เจ้าของอ่าน/เขียน/เข้า folder ได้คนเดียว |
+| `chmod 600 ~/.ssh/authorized_keys` | ให้เจ้าของอ่าน/เขียน key file ได้คนเดียว    |
+| `chmod +x src/*.py`                | ทำให้ Python script execute ได้             |
 
 ---
 
@@ -191,6 +190,8 @@ scp -r .\src\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
 scp -r .\slurm\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
 ```
 
+ถ้าไม่มี `requirements.txt` หรือ `environment.yml` ให้ข้ามสองบรรทัดแรก แล้วไปสร้าง environment และติดตั้ง library เองในหัวข้อ 9-10
+
 ถ้าใช้ Git Bash:
 
 ```bash
@@ -198,6 +199,8 @@ scp ./requirements.txt lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/
 scp ./environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
 scp -r ./src/ ./slurm/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
 ```
+
+ถ้าใช้ Git Bash และไม่มีสองไฟล์นี้ ให้ข้ามสองบรรทัดแรกเช่นกัน
 
 ---
 
@@ -260,6 +263,8 @@ mamba --version || true
 conda --version || true
 ```
 
+### กรณีมีไฟล์ `environment.yml`
+
 ถ้ามี `mamba`:
 
 ```bash
@@ -285,20 +290,62 @@ which python
 python --version
 ```
 
+### กรณีไม่มีไฟล์ `environment.yml`
+
+ให้สร้าง environment เองด้วยชื่อเดียวกับใน workshop:
+
+```bash
+mamba create -n lanta-cv python=3.10 pip -y
+```
+
+ถ้าไม่มี `mamba`:
+
+```bash
+conda create -n lanta-cv python=3.10 pip -y
+```
+
+จากนั้น activate:
+
+```bash
+conda activate lanta-cv
+```
+
+ติดตั้ง library พื้นฐานที่ conda จัดการได้ดี:
+
+```bash
+mamba install -c conda-forge numpy pandas matplotlib scikit-learn tqdm pillow pyyaml -y
+```
+
+ถ้าไม่มี `mamba`:
+
+```bash
+conda install -c conda-forge numpy pandas matplotlib scikit-learn tqdm pillow pyyaml -y
+```
+
 ---
 
 ## 10. ติดตั้ง library ด้วย pip
 
 บน LANTA หลัง activate env:
 
+### กรณีมีไฟล์ `requirements.txt`
+
 ```bash
 pip install -r requirements.txt
 ```
 
-หรือถ้าติดตั้งเอง:
+### กรณีไม่มีไฟล์ `requirements.txt`
+
+ให้พิมพ์ชื่อ library ที่ต้องใช้เอง:
 
 ```bash
-pip install ultralytics opencv-python pandas matplotlib tqdm scikit-learn
+pip install ultralytics opencv-python pandas matplotlib tqdm scikit-learn pillow pyyaml
+```
+
+ถ้าต้องการบันทึกรายการ library ที่ติดตั้งไว้ใช้ซ้ำภายหลัง:
+
+```bash
+pip freeze > requirements.txt
 ```
 
 เช็กว่า import ได้ไหม:
@@ -336,6 +383,27 @@ conda activate lanta-cv
 python src/check_env.py
 ```
 
+คำอธิบายทีละบรรทัด:
+
+| บรรทัด                            | ความหมาย                                                        |
+| --------------------------------- | --------------------------------------------------------------- |
+| `#!/bin/bash`                     | บอกระบบให้รันไฟล์นี้ด้วย Bash shell                             |
+| `#SBATCH --job-name=cv_cpu_test`  | ตั้งชื่อ job ให้ดูง่ายใน `squeue` และชื่อ log                   |
+| `#SBATCH --partition=cpu`         | ขอส่งงานเข้า CPU partition                                      |
+| `#SBATCH --nodes=1`               | ขอใช้ compute node 1 เครื่อง                                    |
+| `#SBATCH --ntasks=1`              | รัน task หลัก 1 task เหมาะกับ Python script ทั่วไป              |
+| `#SBATCH --cpus-per-task=4`       | ให้ task นี้ใช้ CPU ได้ 4 cores                                 |
+| `#SBATCH --mem=16G`               | ขอ RAM 16 GB                                                    |
+| `#SBATCH --time=01:00:00`         | จำกัดเวลารันสูงสุด 1 ชั่วโมง                                    |
+| `#SBATCH --output=logs/%x-%j.out` | เก็บ stdout ใน `logs/` โดย `%x` คือชื่อ job และ `%j` คือ job id |
+| `#SBATCH --error=logs/%x-%j.err`  | เก็บ stderr หรือ error log ใน `logs/`                           |
+| `set -e`                          | ถ้าคำสั่งใด fail ให้หยุด job ทันที                              |
+| `PROJECT_DIR=...`                 | กำหนด path โปรเจกต์บน shared storage                            |
+| `cd "$PROJECT_DIR"`               | เข้า folder โปรเจกต์ก่อนรันงาน                                  |
+| `source ~/.bashrc`                | โหลด shell config เพื่อให้ใช้ `conda activate` ได้              |
+| `conda activate lanta-cv`         | เปิด conda environment ที่เตรียมไว้                             |
+| `python src/check_env.py`         | รัน script สำหรับตรวจ environment                               |
+
 ส่ง job:
 
 ```bash
@@ -369,8 +437,32 @@ cd "$PROJECT_DIR"
 source ~/.bashrc
 conda activate lanta-cv
 
+python src/check_env.py
 python src/train_yolo_example.py
 ```
+
+คำอธิบายทีละบรรทัด:
+
+| บรรทัด                             | ความหมาย                                                         |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| `#!/bin/bash`                      | บอกระบบให้รันไฟล์นี้ด้วย Bash shell                              |
+| `#SBATCH --job-name=cv_gpu_train`  | ตั้งชื่อ job สำหรับงาน train ด้วย GPU                            |
+| `#SBATCH --partition=gpu`          | ขอส่งงานเข้า GPU partition                                       |
+| `#SBATCH --nodes=1`                | ขอใช้ compute node 1 เครื่อง                                     |
+| `#SBATCH --ntasks=1`               | รัน task หลัก 1 task                                             |
+| `#SBATCH --cpus-per-task=8`        | ให้ task นี้ใช้ CPU ได้ 8 cores เพื่อช่วยโหลดข้อมูล/เตรียม batch |
+| `#SBATCH --mem=32G`                | ขอ RAM 32 GB                                                     |
+| `#SBATCH --gres=gpu:1`             | ขอ GPU 1 ใบ                                                      |
+| `#SBATCH --time=04:00:00`          | จำกัดเวลารันสูงสุด 4 ชั่วโมง                                     |
+| `#SBATCH --output=logs/%x-%j.out`  | เก็บ stdout ใน `logs/` โดย `%x` คือชื่อ job และ `%j` คือ job id  |
+| `#SBATCH --error=logs/%x-%j.err`   | เก็บ stderr หรือ error log ใน `logs/`                            |
+| `set -e`                           | ถ้าคำสั่งใด fail ให้หยุด job ทันที                               |
+| `PROJECT_DIR=...`                  | กำหนด path โปรเจกต์บน shared storage                             |
+| `cd "$PROJECT_DIR"`                | เข้า folder โปรเจกต์ก่อนรันงาน                                   |
+| `source ~/.bashrc`                 | โหลด shell config เพื่อให้ใช้ `conda activate` ได้               |
+| `conda activate lanta-cv`          | เปิด conda environment ที่เตรียมไว้                              |
+| `python src/check_env.py`          | ตรวจ Python, library, และ GPU ก่อนเริ่ม train                    |
+| `python src/train_yolo_example.py` | รัน training script ตัวอย่าง                                     |
 
 ส่ง job:
 
@@ -458,15 +550,15 @@ nvidia-smi || true
 
 ## 16. Troubleshooting Windows
 
-| ปัญหา | วิธีแก้ |
-|---|---|
-| `ssh` ใช้ไม่ได้ | เปิด Optional Features แล้วติดตั้ง OpenSSH Client หรือใช้ Git Bash |
-| `Permission denied (publickey)` | เช็ก path key ใน `~/.ssh/config`, เช็ก `authorized_keys` บน LANTA |
-| `scp` path ผิด | PowerShell ใช้ `.\folder\file`, Git Bash ใช้ `./folder/file` |
-| upload ช้ามาก | zip data ก่อน หรือใช้ `rsync` ถ้ามีใน Git Bash |
-| conda activate ไม่ได้ | ลอง `source ~/.bashrc` แล้ว `conda activate lanta-cv` |
-| job pending | เช็ก `squeue`, `sinfo`, partition, quota, time limit |
-| `No such file or directory` | เช็กว่า path เป็น `/project/992000-zdevb/zz992005/$USER/test` ไม่ใช่ `~/projects/...` |
+| ปัญหา                           | วิธีแก้                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------- |
+| `ssh` ใช้ไม่ได้                 | เปิด Optional Features แล้วติดตั้ง OpenSSH Client หรือใช้ Git Bash                    |
+| `Permission denied (publickey)` | เช็ก path key ใน `~/.ssh/config`, เช็ก `authorized_keys` บน LANTA                     |
+| `scp` path ผิด                  | PowerShell ใช้ `.\folder\file`, Git Bash ใช้ `./folder/file`                          |
+| upload ช้ามาก                   | zip data ก่อน หรือใช้ `rsync` ถ้ามีใน Git Bash                                        |
+| conda activate ไม่ได้           | ลอง `source ~/.bashrc` แล้ว `conda activate lanta-cv`                                 |
+| job pending                     | เช็ก `squeue`, `sinfo`, partition, quota, time limit                                  |
+| `No such file or directory`     | เช็กว่า path เป็น `/project/992000-zdevb/zz992005/$USER/test` ไม่ใช่ `~/projects/...` |
 
 ---
 
