@@ -11,14 +11,14 @@
 | ประเภท                      | Path                                        |
 | --------------------------- | ------------------------------------------- |
 | Private path                | `/home/<USERNAME>`                          |
-| Shared path รวม             | `/project/992000-zdevb/`                    |
-| Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005`            |
-| Project path ที่แนะนำ       | `/project/992000-zdevb/zz992005/<USERNAME>` |
+| Shared path รวม             | `/project/zz992000-zdevb/`                    |
+| Shared path บ้าน Pangpuriye | `/project/zz992000-zdevb/zz992005`            |
+| Project path ที่แนะนำ       | `/project/zz992000-zdevb/zz992005/<USERNAME>` |
 
 ในคำสั่งด้านล่าง เราจะใช้ project path นี้เป็นหลัก:
 
 ```bash
-/project/992000-zdevb/zz992005/<USERNAME>/test
+/project/zz992000-zdevb/zz992005/<USERNAME>/test
 ```
 
 ## 0. สิ่งที่ต้องมีบน Windows
@@ -143,8 +143,8 @@ ssh lanta-transfer
 บน LANTA:
 
 ```bash
-mkdir -p /project/992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
-cd /project/992000-zdevb/zz992005/$USER/test
+mkdir -p /project/zz992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
+cd /project/zz992000-zdevb/zz992005/$USER/test
 pwd
 ls -la
 ```
@@ -184,10 +184,10 @@ chmod +x src/*.py 2>/dev/null || true
 ให้เปิด PowerShell ที่ root folder ของ repo นี้ แล้วรัน:
 
 ```powershell
-scp .\requirements.txt lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
-scp .\environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
-scp -r .\src\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
-scp -r .\slurm\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
+scp .\requirements.txt lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
+scp .\environment.yml lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
+scp -r .\src\ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
+scp -r .\slurm\ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
 ```
 
 ถ้าไม่มี `requirements.txt` หรือ `environment.yml` ให้ข้ามสองบรรทัดแรก แล้วไปสร้าง environment และติดตั้ง library เองในหัวข้อ 9-10
@@ -195,9 +195,9 @@ scp -r .\slurm\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
 ถ้าใช้ Git Bash:
 
 ```bash
-scp ./requirements.txt lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
-scp ./environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
-scp -r ./src/ ./slurm/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
+scp ./requirements.txt lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
+scp ./environment.yml lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
+scp -r ./src/ ./slurm/ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
 ```
 
 ถ้าใช้ Git Bash และไม่มีสองไฟล์นี้ ให้ข้ามสองบรรทัดแรกเช่นกัน
@@ -209,26 +209,26 @@ scp -r ./src/ ./slurm/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/
 PowerShell:
 
 ```powershell
-scp -r .\data\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/data/
+scp -r .\data\ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/data/
 ```
 
 Git Bash:
 
 ```bash
-scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/data/
+scp -r ./data/ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/data/
 ```
 
 ถ้า data ใหญ่มาก แนะนำ zip ก่อน:
 
 ```powershell
 Compress-Archive -Path .\data\* -DestinationPath data.zip
-scp .\data.zip lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
+scp .\data.zip lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
 ```
 
 บน LANTA:
 
 ```bash
-cd /project/992000-zdevb/zz992005/$USER/test
+cd /project/zz992000-zdevb/zz992005/$USER/test
 unzip data.zip -d data
 ```
 
@@ -239,14 +239,14 @@ unzip data.zip -d data
 PowerShell:
 
 ```powershell
-scp .\src\train.py lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/src/
-scp .\notebooks\experiment.ipynb lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/src/
+scp .\src\train.py lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/src/
+scp .\notebooks\experiment.ipynb lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/src/
 ```
 
 บน LANTA เช็กไฟล์:
 
 ```bash
-ls -lh /project/992000-zdevb/zz992005/$USER/test/src/
+ls -lh /project/zz992000-zdevb/zz992005/$USER/test/src/
 ```
 
 หมายเหตุ: บน HPC มักนิยมรัน `.py` ผ่าน Slurm มากกว่า `.ipynb` ถ้ามี notebook ให้ export เป็น Python script ก่อน
@@ -258,7 +258,7 @@ ls -lh /project/992000-zdevb/zz992005/$USER/test/src/
 บน LANTA:
 
 ```bash
-cd /project/992000-zdevb/zz992005/$USER/test
+cd /project/zz992000-zdevb/zz992005/$USER/test
 mamba --version || true
 conda --version || true
 ```
@@ -374,7 +374,7 @@ python -c "import cv2, pandas, ultralytics; print('OK')"
 
 set -e
 
-PROJECT_DIR="/project/992000-zdevb/zz992005/${USER}/test"
+PROJECT_DIR="/project/zz992000-zdevb/zz992005/${USER}/test"
 cd "$PROJECT_DIR"
 
 source ~/.bashrc
@@ -431,7 +431,7 @@ sbatch slurm/run_cpu.sbatch
 
 set -e
 
-PROJECT_DIR="/project/992000-zdevb/zz992005/${USER}/test"
+PROJECT_DIR="/project/zz992000-zdevb/zz992005/${USER}/test"
 cd "$PROJECT_DIR"
 
 source ~/.bashrc
@@ -507,17 +507,17 @@ scancel <JOB_ID>
 PowerShell:
 
 ```powershell
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/outputs/ .\outputs\
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/logs/ .\logs\
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/models/ .\models\
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/outputs/ .\outputs\
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/logs/ .\logs\
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/models/ .\models\
 ```
 
 Git Bash:
 
 ```bash
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/logs/ ./logs/
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/models/ ./models/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/logs/ ./logs/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/models/ ./models/
 ```
 
 ---
@@ -558,7 +558,7 @@ nvidia-smi || true
 | upload ช้ามาก                   | zip data ก่อน หรือใช้ `rsync` ถ้ามีใน Git Bash                                        |
 | conda activate ไม่ได้           | ลอง `source ~/.bashrc` แล้ว `conda activate lanta-cv`                                 |
 | job pending                     | เช็ก `squeue`, `sinfo`, partition, quota, time limit                                  |
-| `No such file or directory`     | เช็กว่า path เป็น `/project/992000-zdevb/zz992005/$USER/test` ไม่ใช่ `~/projects/...` |
+| `No such file or directory`     | เช็กว่า path เป็น `/project/zz992000-zdevb/zz992005/$USER/test` ไม่ใช่ `~/projects/...` |
 
 ---
 
@@ -571,15 +571,15 @@ ssh <USERNAME>@transfer.lanta.nstda.or.th
 ssh-keygen -t ed25519 -C "lanta" -f $env:USERPROFILE\.ssh\lanta_ed25519
 notepad $env:USERPROFILE\.ssh\config
 ssh lanta-transfer
-scp -r .\data\ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/data/
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/outputs/ .\outputs\
+scp -r .\data\ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/data/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/outputs/ .\outputs\
 ```
 
 บน LANTA:
 
 ```bash
-mkdir -p /project/992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
-cd /project/992000-zdevb/zz992005/$USER/test
+mkdir -p /project/zz992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
+cd /project/zz992000-zdevb/zz992005/$USER/test
 mamba env create -f environment.yml
 conda activate lanta-cv
 pip install -r requirements.txt

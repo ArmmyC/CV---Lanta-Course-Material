@@ -31,14 +31,14 @@
 | ประเภท | Path |
 |---|---|
 | Private path | `/home/<USERNAME>` |
-| Shared path รวม | `/project/992000-zdevb/` |
-| Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005` |
-| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>/` |
+| Shared path รวม | `/project/zz992000-zdevb/` |
+| Shared path บ้าน Pangpuriye | `/project/zz992000-zdevb/zz992005` |
+| Project path ที่แนะนำ | `/project/zz992000-zdevb/zz992005/<USERNAME>/` |
 
 ในคำสั่งด้านล่าง เราจะใช้ project path นี้เป็นหลัก:
 
 ```bash
-/project/992000-zdevb/zz992005/<USERNAME>/test
+/project/zz992000-zdevb/zz992005/<USERNAME>/test
 ```
 
 
@@ -83,8 +83,8 @@ ssh lanta-transfer
 หลังเข้า LANTA ได้แล้ว ให้สร้าง project folder ใน shared path:
 
 ```bash
-mkdir -p /project/992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
-cd /project/992000-zdevb/zz992005/$USER/test
+mkdir -p /project/zz992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
+cd /project/zz992000-zdevb/zz992005/$USER/test
 pwd
 ```
 
@@ -93,8 +93,8 @@ pwd
 จากเครื่องเรา:
 
 ```bash
-scp -r ./src ./slurm ./requirements.txt ./environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
-scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/data/
+scp -r ./src ./slurm ./requirements.txt ./environment.yml lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
+scp -r ./data/ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/data/
 ```
 
 ### ช่วงที่ 4: สร้าง environment และส่ง job
@@ -102,7 +102,7 @@ scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/dat
 บน LANTA:
 
 ```bash
-cd /project/992000-zdevb/zz992005/$USER/test
+cd /project/zz992000-zdevb/zz992005/$USER/test
 mamba env create -f environment.yml
 conda activate lanta-cv
 pip install -r requirements.txt
@@ -115,9 +115,9 @@ sbatch slurm/run_gpu.sbatch
 จากเครื่องเรา:
 
 ```bash
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/logs/ ./logs/
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/models/ ./models/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/logs/ ./logs/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/models/ ./models/
 ```
 
 ## หมายเหตุสำคัญ

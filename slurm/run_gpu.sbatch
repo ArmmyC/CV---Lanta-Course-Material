@@ -12,7 +12,7 @@
 
 set -e
 
-PROJECT_DIR="/project/992000-zdevb/zz992005/${USER}/lpr-hackathon"
+PROJECT_DIR="/project/zz992000-zdevb/zz992005/${USER}/lpr-hackathon"
 cd "$PROJECT_DIR"
 
 source ~/.bashrc

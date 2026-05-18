@@ -11,14 +11,14 @@
 | ประเภท | Path |
 |---|---|
 | Private path | `/home/<USERNAME>` |
-| Shared path รวม | `/project/992000-zdevb/` |
-| Shared path บ้าน Pangpuriye | `/project/992000-zdevb/zz992005` |
-| Project path ที่แนะนำ | `/project/992000-zdevb/zz992005/<USERNAME>` |
+| Shared path รวม | `/project/zz992000-zdevb/` |
+| Shared path บ้าน Pangpuriye | `/project/zz992000-zdevb/zz992005` |
+| Project path ที่แนะนำ | `/project/zz992000-zdevb/zz992005/<USERNAME>` |
 
 ในคำสั่งด้านล่าง เราจะใช้ project path นี้เป็นหลัก:
 
 ```bash
-/project/992000-zdevb/zz992005/<USERNAME>/test
+/project/zz992000-zdevb/zz992005/<USERNAME>/test
 ```
 
 
@@ -135,8 +135,8 @@ ssh lanta-transfer
 บน LANTA:
 
 ```bash
-mkdir -p /project/992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
-cd /project/992000-zdevb/zz992005/$USER/test
+mkdir -p /project/zz992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
+cd /project/zz992000-zdevb/zz992005/$USER/test
 pwd
 ls -la
 ```
@@ -158,9 +158,9 @@ chmod +x src/*.py 2>/dev/null || true
 จากเครื่องเรา:
 
 ```bash
-scp ./requirements.txt lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
-scp ./environment.yml lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
-scp -r ./src/ ./slurm/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
+scp ./requirements.txt lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
+scp ./environment.yml lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
+scp -r ./src/ ./slurm/ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
 ```
 
 ถ้าไม่มี `requirements.txt` หรือ `environment.yml` ให้ข้ามสองบรรทัดแรก แล้วไปสร้าง environment และติดตั้ง library เองในหัวข้อ 9-10
@@ -170,27 +170,27 @@ scp -r ./src/ ./slurm/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/
 ## 7. Upload data ไป LANTA ด้วย scp
 
 ```bash
-scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/data/
+scp -r ./data/ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/data/
 ```
 
 ถ้า data ใหญ่มาก:
 
 ```bash
 zip -r data.zip data/
-scp data.zip lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/
+scp data.zip lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
 ```
 
 บน LANTA:
 
 ```bash
-cd /project/992000-zdevb/zz992005/$USER/test
+cd /project/zz992000-zdevb/zz992005/$USER/test
 unzip data.zip -d .
 ```
 
 ถ้ามี `rsync`:
 
 ```bash
-rsync -avP ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/data/
+rsync -avP ./data/ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/data/
 ```
 
 ---
@@ -198,14 +198,14 @@ rsync -avP ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test
 ## 8. Upload ไฟล์ `.py` หรือ `.ipynb`
 
 ```bash
-scp ./src/train.py lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/src/
-scp ./notebooks/experiment.ipynb lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/src/
+scp ./src/train.py lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/src/
+scp ./notebooks/experiment.ipynb lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/src/
 ```
 
 บน LANTA:
 
 ```bash
-ls -lh /project/992000-zdevb/zz992005/$USER/test/src/
+ls -lh /project/zz992000-zdevb/zz992005/$USER/test/src/
 ```
 
 ---
@@ -215,7 +215,7 @@ ls -lh /project/992000-zdevb/zz992005/$USER/test/src/
 บน LANTA:
 
 ```bash
-cd /project/992000-zdevb/zz992005/$USER/test
+cd /project/zz992000-zdevb/zz992005/$USER/test
 mamba --version || true
 conda --version || true
 ```
@@ -329,7 +329,7 @@ python -c "import cv2, pandas, ultralytics; print('OK')"
 
 set -e
 
-PROJECT_DIR="/project/992000-zdevb/zz992005/${USER}/test"
+PROJECT_DIR="/project/zz992000-zdevb/zz992005/${USER}/test"
 cd "$PROJECT_DIR"
 
 source ~/.bashrc
@@ -362,7 +362,7 @@ python src/check_env.py
 ส่ง job:
 
 ```bash
-cd /project/992000-zdevb/zz992005/$USER/test
+cd /project/zz992000-zdevb/zz992005/$USER/test
 sbatch slurm/run_cpu.sbatch
 ```
 
@@ -387,7 +387,7 @@ sbatch slurm/run_cpu.sbatch
 
 set -e
 
-PROJECT_DIR="/project/992000-zdevb/zz992005/${USER}/test"
+PROJECT_DIR="/project/zz992000-zdevb/zz992005/${USER}/test"
 cd "$PROJECT_DIR"
 
 source ~/.bashrc
@@ -423,7 +423,7 @@ python src/train_yolo_example.py
 ส่ง job:
 
 ```bash
-cd /project/992000-zdevb/zz992005/$USER/test
+cd /project/zz992000-zdevb/zz992005/$USER/test
 sbatch slurm/run_gpu.sbatch
 ```
 
@@ -450,15 +450,15 @@ scancel <JOB_ID>
 ## 14. Download output กลับ macOS
 
 ```bash
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/logs/ ./logs/
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/models/ ./models/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/logs/ ./logs/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/models/ ./models/
 ```
 
 หรือใช้ rsync:
 
 ```bash
-rsync -avP lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
+rsync -avP lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
 ```
 
 ---
@@ -494,7 +494,7 @@ nvidia-smi || true
 | upload ช้ามาก | ใช้ `rsync -avP` หรือ zip data ก่อน |
 | job pending | เช็ก `squeue`, `sinfo`, partition, quota, time limit |
 | conda activate ไม่ได้ | ลอง `source ~/.bashrc` แล้ว `conda activate lanta-cv` |
-| path ไม่เจอ | ใช้ `/project/992000-zdevb/zz992005/$USER/test` |
+| path ไม่เจอ | ใช้ `/project/zz992000-zdevb/zz992005/$USER/test` |
 
 ---
 
@@ -505,15 +505,15 @@ ssh <USERNAME>@transfer.lanta.nstda.or.th
 ssh-keygen -t ed25519 -C "lanta" -f ~/.ssh/lanta_ed25519
 nano ~/.ssh/config
 ssh lanta-transfer
-scp -r ./data/ lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/data/
-scp -r lanta-transfer:/project/992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
+scp -r ./data/ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/data/
+scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
 ```
 
 บน LANTA:
 
 ```bash
-mkdir -p /project/992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
-cd /project/992000-zdevb/zz992005/$USER/test
+mkdir -p /project/zz992000-zdevb/zz992005/$USER/test/{data,src,slurm,outputs,logs,models}
+cd /project/zz992000-zdevb/zz992005/$USER/test
 mamba env create -f environment.yml
 conda activate lanta-cv
 pip install -r requirements.txt
