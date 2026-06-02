@@ -137,11 +137,11 @@ ssh lanta
 ```powershell
 ssh -M lanta
 ```
-บอก Codex test ssh lanta ได้เลย
-Path หลัก `/project/zz992000-zdevb/zz992005` 
-Path ของ Data ที่ Embedded แล้ว `/project/zz992000-zdevb/zz992005/processed_data/fahmai.duckdb`
-กับ `/project/zz992000-zdevb/zz992005/processed_data/embedding_manifest_BAAI_bge-m3.json`
-Path ของ Raw Data และ question.csv `/project/zz992000-zdevb/zz992005/processed_data/data-hack4`
+บอก Codex test ssh lanta ได้เลย  
+Path หลัก `/project/zz992000-zdevb/zz992005`   
+Path ของ Data ที่ Embedded แล้ว `/project/zz992000-zdevb/zz992005/processed_data/fahmai.duckdb`  
+กับ `/project/zz992000-zdevb/zz992005/processed_data/embedding_manifest_BAAI_bge-m3.json`  
+Path ของ Raw Data และ question.csv `/project/zz992000-zdevb/zz992005/processed_data/data-hack4`  
 
 สิ่งสำคัญที่ควรบอก Codex ตอนจะใช้ Slurm
 ```powershell
