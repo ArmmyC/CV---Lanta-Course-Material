@@ -78,7 +78,7 @@ exit
 ssh-keygen -t ed25519 -C "lanta" -f $env:USERPROFILE\.ssh\lanta_ed25519
 ```
 
-กด Enter ตามขั้นตอน แนะนำให้ตั้ง passphrase
+กด Enter ตามขั้นตอน อย่าตั้ง passphrase เด็ดขาดดด
 
 ดู public key:
 
@@ -111,7 +111,7 @@ notepad $env:USERPROFILE\.ssh\config
 ใส่เนื้อหานี้:
 
 ```sshconfig
-Host lanta-transfer
+Host lanta
     HostName transfer.lanta.nstda.or.th
     User <USERNAME>
     IdentityFile ~/.ssh/lanta_ed25519
@@ -121,16 +121,33 @@ Host lanta-transfer
 ทดสอบ:
 
 ```powershell
-ssh lanta-transfer
+ssh lanta
 ```
 
 จากนี้ให้ใช้คำสั่งสั้น ๆ ได้เลย:
 
 ```powershell
-ssh lanta-transfer
+ssh lanta
 ```
 
 ---
+
+## วิธีนำไปใข้ใน Codex
+
+```powershell
+ssh -M lanta
+```
+บอก Codex test ssh lanta ได้เลย
+Path หลัก `/project/zz992000-zdevb/zz992005` 
+Path ของ Data ที่ Embedded แล้ว `/project/zz992000-zdevb/zz992005/processed_data/fahmai.duckdb`
+กับ `/project/zz992000-zdevb/zz992005/processed_data/embedding_manifest_BAAI_bge-m3.json`
+Path ของ Raw Data และ question.csv `/project/zz992000-zdevb/zz992005/processed_data/data-hack4`
+
+สิ่งสำคัญที่ควรบอก Codex ตอนจะใช้ Slurm
+```powershell
+qos=zz992005
+account=zz992005
+```
 
 ## 4. สร้าง project folder บน LANTA
 
