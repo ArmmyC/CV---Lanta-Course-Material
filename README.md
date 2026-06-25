@@ -1,12 +1,24 @@
 # LANTA Workshop
 
-คู่มือนี้ใช้สำหรับสอนทีมให้ใช้งาน **LANTA**
+คู่มือและ template สำหรับสอนทีมให้เริ่มใช้งาน **LANTA** สำหรับงาน Computer Vision และการส่งงานผ่าน Slurm ตั้งแต่การตั้งค่า SSH ไปจนถึงการสร้าง environment, upload ไฟล์, ส่ง job, และดึง output กลับมาใช้งาน
+
+![SSH](https://img.shields.io/badge/SSH-LANTA-0f766e?style=flat-square)
+![Slurm](https://img.shields.io/badge/Slurm-CPU%2FGPU-2563eb?style=flat-square)
+![Python](https://img.shields.io/badge/Python-3.10-3776ab?style=flat-square&logo=python&logoColor=white)
+![YOLO](https://img.shields.io/badge/YOLO-Ultralytics-111827?style=flat-square)
+
+> [!NOTE]
+> README หลักนี้เป็นภาพรวมของ workshop ส่วนขั้นตอนละเอียดแยกตาม OS อยู่ใน `README_Windows.md`, `README_Linux.md`, และ `README_Mac.md`
 
 ## เลือกระบบปฏิบัติการ
 
-- [Windows Guide](./README_Windows.md)
-- [Linux Guide](./README_Linux.md)
-- [macOS Guide](./README_Mac.md)
+เริ่มจากคู่มือที่ตรงกับเครื่องของคุณ:
+
+| OS | Guide | เหมาะสำหรับ |
+|---|---|---|
+| Windows | [Windows Guide](./README_Windows.md) | Windows Terminal, PowerShell, Git Bash |
+| Linux | [Linux Guide](./README_Linux.md) | Ubuntu, Debian, Fedora และ Linux distribution อื่น ๆ |
+| macOS | [macOS Guide](./README_Mac.md) | Terminal หรือ iTerm2 |
 
 ## สิ่งที่จะได้เรียน
 
@@ -17,14 +29,16 @@
 5. ตั้ง permission ที่จำเป็น
 6. สร้าง Python environment ด้วย mamba/conda
 7. ติดตั้ง library ด้วย pip
-8. upload data/code ไป LANTA ด้วย `scp`
+8. Upload data/code ไป LANTA ด้วย `scp`
 9. เขียนและส่ง Slurm job สำหรับ CPU/GPU
 10. ดูสถานะ job และ log
-11. download output กลับเครื่องตัวเอง
+11. Download output กลับเครื่องตัวเอง
 
-> เปลี่ยน `<USERNAME>` เป็น username ของคุณบน LANTA  
+> [!IMPORTANT]
+> เปลี่ยน `<USERNAME>` เป็น username ของคุณบน LANTA ทุกครั้งก่อนรันคำสั่ง
+>
 > Host: `transfer.lanta.nstda.or.th`  
-> Alias ที่จะใช้หลังตั้งค่า SSH config: `lanta-transfer`
+> Alias หลังตั้งค่า SSH config: `lanta-transfer`
 
 ## Path ที่ใช้ใน workshop นี้
 
@@ -41,6 +55,8 @@
 /project/zz992000-zdevb/zz992005/<USERNAME>/test
 ```
 
+> [!TIP]
+> หลังเข้า LANTA แล้วสามารถใช้ `$USER` แทน username ของตัวเองได้ เช่น `/project/zz992000-zdevb/zz992005/$USER/test`
 
 ## โครงสร้าง repository ที่แนะนำ
 
@@ -63,6 +79,17 @@ test/
     ├── check_env.py
     └── train_yolo_example.py
 ```
+
+| ไฟล์/โฟลเดอร์ | ใช้ทำอะไร |
+|---|---|
+| `environment.yml` | สร้าง conda/mamba environment ชื่อ `lanta-cv` |
+| `requirements.txt` | ติดตั้ง Python packages เพิ่มเติมด้วย `pip` |
+| `src/check_env.py` | ตรวจ Python, CUDA, OpenCV, Torch และ Ultralytics |
+| `src/train_yolo_example.py` | ตัวอย่าง train/validate YOLO แบบสั้นสำหรับ workshop |
+| `slurm/run_cpu.sbatch` | Template สำหรับส่ง CPU job |
+| `slurm/run_gpu.sbatch` | Template สำหรับส่ง GPU job |
+| `data/` | เก็บ dataset หรือไฟล์ input |
+| `outputs/`, `logs/`, `models/` | เก็บผลลัพธ์, log และโมเดล |
 
 ### ช่วงที่ 1: Setup local machine
 
@@ -88,13 +115,27 @@ cd /project/zz992000-zdevb/zz992005/$USER/test
 pwd
 ```
 
+ตรวจว่าอยู่ path ที่ถูกต้อง:
+
+```bash
+echo $USER
+pwd
+df -h .
+```
+
 ### ช่วงที่ 3: Upload code และ data
 
-จากเครื่องเรา:
+จากเครื่องเรา ให้รันที่ root folder ของ repo นี้:
 
 ```bash
 scp -r ./src ./slurm ./requirements.txt ./environment.yml lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/
 scp -r ./data/ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/data/
+```
+
+ถ้า data ใหญ่ แนะนำใช้ `rsync` เพื่อ resume ได้ง่ายกว่า:
+
+```bash
+rsync -avP ./data/ lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/data/
 ```
 
 ### ช่วงที่ 4: สร้าง environment และส่ง job
@@ -106,9 +147,24 @@ cd /project/zz992000-zdevb/zz992005/$USER/test
 mamba env create -f environment.yml
 conda activate lanta-cv
 pip install -r requirements.txt
+```
+
+ก่อนส่ง job ให้ตรวจ `PROJECT_DIR` ในไฟล์ `slurm/run_cpu.sbatch` และ `slurm/run_gpu.sbatch` ให้ตรงกับ project path ของคุณ
+
+```bash
 sbatch slurm/run_cpu.sbatch
 sbatch slurm/run_gpu.sbatch
 ```
+
+ดูสถานะ job และ log:
+
+```bash
+squeue -u $USER
+ls -lh logs/
+```
+
+> [!WARNING]
+> ชื่อ partition, account, QOS และ GPU resource อาจต่างกันตามระบบจริง ให้เช็กด้วย `sinfo` หรือข้อมูลจากผู้ดูแล LANTA ก่อนส่งงานจริง
 
 ### ช่วงที่ 5: Download output
 
@@ -120,13 +176,22 @@ scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/logs/ ./l
 scp -r lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/models/ ./models/
 ```
 
+หรือใช้ `rsync` ถ้า output มีขนาดใหญ่:
+
+```bash
+rsync -avP lanta-transfer:/project/zz992000-zdevb/zz992005/<USERNAME>/test/outputs/ ./outputs/
+```
+
 ## หมายเหตุสำคัญ
 
-- ใช้ SSH config เพื่อให้สั้นเหลือแค่ `ssh lanta-transfer`
-- ชื่อ partition ใน Slurm เช่น `cpu` และ `gpu` เป็น template ให้เช็กของจริงด้วย:
+- ใช้ SSH config เพื่อให้คำสั่งสั้นเหลือแค่ `ssh lanta-transfer`
+- ใช้ `<USERNAME>` บนเครื่องตัวเอง และใช้ `$USER` เมื่ออยู่บน LANTA
+- ตรวจ `PROJECT_DIR` ใน Slurm script ก่อน `sbatch` ทุกครั้ง
+- ตรวจ partition และ resource จริงก่อนส่ง job:
 
 ```bash
 sinfo
 squeue -u $USER
 ```
 
+- ถ้า GPU job ไม่เริ่ม ให้เช็ก queue, QOS, account และ resource limit ของ project ก่อน
