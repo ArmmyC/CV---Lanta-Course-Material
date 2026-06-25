@@ -1,14 +1,23 @@
+<!-- prettier-ignore -->
+<div align="center">
+
 # LANTA Workshop
 
-คู่มือและ template สำหรับสอนทีมให้เริ่มใช้งาน **LANTA** สำหรับงาน Computer Vision และการส่งงานผ่าน Slurm ตั้งแต่การตั้งค่า SSH ไปจนถึงการสร้าง environment, upload ไฟล์, ส่ง job, และดึง output กลับมาใช้งาน
+*คู่มือและ template สำหรับเริ่มใช้งาน LANTA กับงาน Computer Vision และ Slurm*
 
 ![SSH](https://img.shields.io/badge/SSH-LANTA-0f766e?style=flat-square)
 ![Slurm](https://img.shields.io/badge/Slurm-CPU%2FGPU-2563eb?style=flat-square)
 ![Python](https://img.shields.io/badge/Python-3.10-3776ab?style=flat-square&logo=python&logoColor=white)
 ![YOLO](https://img.shields.io/badge/YOLO-Ultralytics-111827?style=flat-square)
 
+[เลือก OS](#เลือกระบบปฏิบัติการ) • [สิ่งที่จะได้เรียน](#สิ่งที่จะได้เรียน) • [Path](#path-ที่ใช้ใน-workshop-นี้) • [Workflow](#ช่วงที่-1-setup-local-machine) • [หมายเหตุ](#หมายเหตุสำคัญ)
+
+</div>
+
+คู่มือและ template สำหรับสอนทีมให้เริ่มใช้งาน **LANTA** สำหรับงาน Computer Vision และการส่งงานผ่าน Slurm ครอบคลุมตั้งแต่การตั้งค่า SSH, สร้าง environment, upload ไฟล์, ส่ง CPU/GPU job, ตรวจ log, และ download output กลับมาใช้งาน
+
 > [!NOTE]
-> README หลักนี้เป็นภาพรวมของ workshop ส่วนขั้นตอนละเอียดแยกตาม OS อยู่ใน `README_Windows.md`, `README_Linux.md`, และ `README_Mac.md`
+> README หลักนี้เป็นภาพรวมของ workshop ส่วนขั้นตอนละเอียดแยกตาม OS อยู่ใน [`README_Windows.md`](./README_Windows.md), [`README_Linux.md`](./README_Linux.md), และ [`README_Mac.md`](./README_Mac.md)
 
 ## เลือกระบบปฏิบัติการ
 
@@ -28,8 +37,8 @@
 4. สร้าง project folder ใน shared path
 5. ตั้ง permission ที่จำเป็น
 6. สร้าง Python environment ด้วย mamba/conda
-7. ติดตั้ง library ด้วย pip
-8. Upload data/code ไป LANTA ด้วย `scp`
+7. ติดตั้ง library ด้วย `pip`
+8. Upload data และ code ไป LANTA ด้วย `scp` หรือ `rsync`
 9. เขียนและส่ง Slurm job สำหรับ CPU/GPU
 10. ดูสถานะ job และ log
 11. Download output กลับเครื่องตัวเอง
@@ -149,7 +158,13 @@ conda activate lanta-cv
 pip install -r requirements.txt
 ```
 
-ก่อนส่ง job ให้ตรวจ `PROJECT_DIR` ในไฟล์ `slurm/run_cpu.sbatch` และ `slurm/run_gpu.sbatch` ให้ตรงกับ project path ของคุณ
+ก่อนส่ง job ให้ตรวจ `PROJECT_DIR` ในไฟล์ `slurm/run_cpu.sbatch` และ `slurm/run_gpu.sbatch` ให้ตรงกับ project path ของคุณ:
+
+```bash
+/project/zz992000-zdevb/zz992005/$USER/test
+```
+
+ส่ง job:
 
 ```bash
 sbatch slurm/run_cpu.sbatch
